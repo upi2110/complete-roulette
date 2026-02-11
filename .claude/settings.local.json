@@ -1,0 +1,34 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pip3 list:*)",
+      "Bash(python3:*)",
+      "Bash(source venv/bin/activate)",
+      "Bash(pip install:*)",
+      "Bash(timeout 10 python:*)",
+      "Bash(python:*)",
+      "Bash(open http://localhost:5050)",
+      "Bash(curl:*)",
+      "mcp__filesystem__directory_tree",
+      "mcp__filesystem__search_files",
+      "mcp__filesystem__list_directory",
+      "Bash(lsof:*)",
+      "Bash(pkill:*)",
+      "Bash(pgrep:*)",
+      "Bash(xargs kill:*)",
+      "Bash(./venv/bin/python -m pytest:*)",
+      "Bash(./venv/bin/pip install:*)",
+      "Bash(./venv/bin/python:*)",
+      "Bash(ls:*)",
+      "mcp__filesystem__read_text_file",
+      "Bash(xargs rm:*)",
+      "Bash(tee:*)",
+      "Bash(kill:*)",
+      "Bash(/Users/ubusan-nb-ecr/Documents/UpenderImp/CompleteCaso/venv/bin/python:*)",
+      "Bash(wc:*)",
+      "Bash(source:*)",
+      "Bash(ps:*)",
+      "Bash(sysctl:*)"
+    ]
+  }
+}

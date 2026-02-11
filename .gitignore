@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.py[cod]
+*.so
+
+# Virtual Environment
+venv/
+.env/
+.envrc
+
+# Mac
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Torch / ML large artifacts
+*.pt
+*.pth
+*.ckpt
+
+# Build
+build/
+dist/
+*.egg-info/
+

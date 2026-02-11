@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Roulette Predictor</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <div class="logo">
+                <svg class="logo-icon" viewBox="0 0 24 24" width="28" height="28"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3" fill="currentColor"/><line x1="12" y1="2" x2="12" y2="5" stroke="currentColor" stroke-width="1.5"/><line x1="12" y1="19" x2="12" y2="22" stroke="currentColor" stroke-width="1.5"/><line x1="2" y1="12" x2="5" y2="12" stroke="currentColor" stroke-width="1.5"/><line x1="19" y1="12" x2="22" y2="12" stroke="currentColor" stroke-width="1.5"/></svg>
+                <h1>AI Roulette Predictor</h1>
+            </div>
+            <span class="version-badge">v1.0</span>
+        </div>
+        <div class="header-center">
+            <div class="connection-status" id="connectionStatus">
+                <span class="status-dot"></span>
+                <span class="status-text">Connecting...</span>
+            </div>
+        </div>
+        <div class="header-right">
+            <button class="btn btn-icon" id="themeToggle" title="Toggle theme">
+                <svg class="icon-sun" viewBox="0 0 24 24" width="20" height="20"><circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="12" y1="1" x2="12" y2="3" stroke="currentColor" stroke-width="2"/><line x1="12" y1="21" x2="12" y2="23" stroke="currentColor" stroke-width="2"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" stroke="currentColor" stroke-width="2"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" stroke="currentColor" stroke-width="2"/><line x1="1" y1="12" x2="3" y2="12" stroke="currentColor" stroke-width="2"/><line x1="21" y1="12" x2="23" y2="12" stroke="currentColor" stroke-width="2"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36" stroke="currentColor" stroke-width="2"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" stroke="currentColor" stroke-width="2"/></svg>
+                <svg class="icon-moon" viewBox="0 0 24 24" width="20" height="20"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+            </button>
+            <button class="btn btn-sm" id="sessionsBtn">Sessions</button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-grid">
+        <!-- Left Column: Wheel + Number Pad -->
+        <div class="left-column">
+            <!-- Roulette Wheel -->
+            <div class="card wheel-card">
+                <div class="card-header">
+                    <h2>Roulette Wheel</h2>
+                </div>
+                <div class="wheel-container" id="wheelContainer">
+                    <canvas id="wheelCanvas" width="400" height="400"></canvas>
+                    <div class="wheel-result" id="wheelResult">-</div>
+                </div>
+                <div class="last-numbers" id="lastNumbers">
+                    <span class="label">Last 10:</span>
+                    <div class="number-pills" id="numberPills"></div>
+                </div>
+            </div>
+
+            <!-- Compact Spin Input (sticky) -->
+            <div class="card spin-input-card" id="spinInputCard">
+                <div class="spin-input-row">
+                    <input type="number" id="spinInput" min="0" max="36" placeholder="0-36" class="spin-input">
+                    <button class="btn btn-primary" id="submitSpin" disabled>Submit</button>
+                    <button class="btn btn-danger btn-sm" id="undoSpin" disabled title="Undo last spin">Undo</button>
+                    <span class="spin-input-bet-size" id="spinBetSize"></span>
+                    <span class="session-timer" id="sessionTimer" style="font-family:var(--font-mono);font-size:0.85rem;color:var(--text-muted);margin-left:auto;">--:--</span>
+                </div>
+            </div>
+            <!-- Hidden number grid for JS compatibility -->
+            <div id="numberGrid" style="display:none;"></div>
+        </div>
+
+        <!-- Center Column: Prediction + Bet Suggestion -->
+        <div class="center-column">
+            <!-- Mode Indicator -->
+            <div class="mode-banner" id="modeBanner">
+                <div class="mode-icon" id="modeIcon">&#9679;</div>
+                <div class="mode-info">
+                    <span class="mode-label" id="modeLabel">WAITING</span>
+                    <span class="mode-reason" id="modeReason">Start a session to begin</span>
+                </div>
+                <div class="mode-bet-amount hidden" id="modeBetAmount">
+                    <span class="mode-bet-label">Total Bet</span>
+                    $0
+                </div>
+            </div>
+
+            <!-- AI Prediction + Bet (Merged) -->
+            <div class="card prediction-card">
+                <div class="card-header">
+                    <h2>AI Prediction</h2>
+                    <div class="confidence-badge" id="confidenceBadge">--</div>
+                </div>
+                <div class="prediction-body">
+                    <!-- BET / WAIT decision -->
+                    <div class="prediction-decision" id="predictionDecision">
+                        <span class="decision-label" id="decisionLabel">WAIT</span>
+                        <span class="decision-detail" id="decisionDetail">Start session to begin</span>
+                    </div>
+
+                    <!-- 12 predicted numbers (4 anchors + 8 neighbours) -->
+                    <div class="top-numbers" id="topNumbers">
+                        <div class="placeholder-text">Start session to see predictions</div>
+                    </div>
+
+                    <!-- Bet info inline -->
+                    <div class="prediction-bet-info hidden" id="predictionBetInfo">
+                        <div class="bet-info-row">
+                            <span class="bet-info-label">Per Number</span>
+                            <span class="bet-info-value" id="betPerNumber">$1.00</span>
+                        </div>
+                        <div class="bet-info-row">
+                            <span class="bet-info-label">Total Bet</span>
+                            <span class="bet-info-value bet-info-total" id="betTotal">$12.00</span>
+                        </div>
+                        <div class="bet-info-row">
+                            <span class="bet-info-label">Coverage</span>
+                            <span class="bet-info-value" id="betCoverage">12/37 (32.4%)</span>
+                        </div>
+                        <div class="bet-info-row">
+                            <span class="bet-info-label">Win Payout</span>
+                            <span class="bet-info-value" id="betWinPayout">35:1</span>
+                        </div>
+                    </div>
+
+                    <div class="confidence-bar-container">
+                        <div class="confidence-label">Confidence</div>
+                        <div class="confidence-bar">
+                            <div class="confidence-fill" id="confidenceFill" style="width: 0%"></div>
+                            <div class="confidence-markers">
+                                <span class="marker" style="left: 45%">BET</span>
+                                <span class="marker" style="left: 65%">HIGH</span>
+                            </div>
+                        </div>
+                        <span class="confidence-value" id="confidenceValue">0%</span>
+                    </div>
+                    <!-- Confidence Breakdown -->
+                    <div class="confidence-breakdown" id="confidenceBreakdown"></div>
+                </div>
+            </div>
+
+            <!-- Money Management Advisor -->
+            <div class="card advisor-card">
+                <div class="card-header">
+                    <h2>Money Management</h2>
+                    <div class="strategy-badge" id="strategyBadge">--</div>
+                </div>
+                <div class="advisor-body" id="advisorBody">
+                    <!-- Action Banner -->
+                    <div class="advisor-action" id="advisorAction">
+                        <div class="advisor-action-icon" id="advisorActionIcon">&#9208;</div>
+                        <div class="advisor-action-info">
+                            <div class="advisor-action-label" id="advisorActionLabel">WAITING</div>
+                            <div class="advisor-action-reason" id="advisorActionReason">Start a session to see advice</div>
+                        </div>
+                    </div>
+
+                    <!-- Bet Sizing (visible only when betting) -->
+                    <div class="advisor-sizing hidden" id="advisorSizing">
+                        <div class="sizing-header">Recommended Bet Sizing</div>
+                        <div class="sizing-grid" id="sizingGrid">
+                            <!-- Filled by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Risk Dashboard -->
+                    <div class="advisor-risk" id="advisorRisk">
+                        <div class="risk-items">
+                            <div class="risk-item">
+                                <span class="risk-label">Risk Level</span>
+                                <span class="risk-value" id="riskLevel">--</span>
+                            </div>
+                            <div class="risk-item">
+                                <span class="risk-label">Drawdown</span>
+                                <span class="risk-value" id="riskDrawdown">0%</span>
+                            </div>
+                            <div class="risk-item">
+                                <span class="risk-label">Momentum</span>
+                                <span class="risk-value" id="riskMomentum">0</span>
+                            </div>
+                            <div class="risk-item">
+                                <span class="risk-label">To Target</span>
+                                <span class="risk-value" id="riskToTarget">$100</span>
+                            </div>
+                            <div class="risk-item">
+                                <span class="risk-label">To Stop-Loss</span>
+                                <span class="risk-value" id="riskToStop">$1,000</span>
+                            </div>
+                            <div class="risk-item">
+                                <span class="risk-label">Strategy</span>
+                                <span class="risk-value" id="riskStrategy">--</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Warnings -->
+                    <div class="advisor-warnings hidden" id="advisorWarnings">
+                        <div class="warnings-list" id="warningsList"></div>
+                    </div>
+
+                    <!-- Tips -->
+                    <div class="advisor-tips hidden" id="advisorTips">
+                        <div class="tips-list" id="tipsList"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Group Probabilities -->
+            <div class="card groups-card">
+                <div class="card-header"><h2>Group Probabilities</h2></div>
+                <div class="prob-grid" id="probGrid">
+                    <div class="prob-row">
+                        <span class="prob-label red-label">Red</span>
+                        <div class="prob-bar"><div class="prob-fill red-fill" id="probRed" style="width:48.6%"></div></div>
+                        <span class="prob-value" id="probRedVal">48.6%</span>
+                    </div>
+                    <div class="prob-row">
+                        <span class="prob-label black-label">Black</span>
+                        <div class="prob-bar"><div class="prob-fill black-fill" id="probBlack" style="width:48.6%"></div></div>
+                        <span class="prob-value" id="probBlackVal">48.6%</span>
+                    </div>
+                    <div class="prob-row">
+                        <span class="prob-label">1st Dozen</span>
+                        <div class="prob-bar"><div class="prob-fill dozen-fill" id="probD1" style="width:32.4%"></div></div>
+                        <span class="prob-value" id="probD1Val">32.4%</span>
+                    </div>
+                    <div class="prob-row">
+                        <span class="prob-label">2nd Dozen</span>
+                        <div class="prob-bar"><div class="prob-fill dozen-fill" id="probD2" style="width:32.4%"></div></div>
+                        <span class="prob-value" id="probD2Val">32.4%</span>
+                    </div>
+                    <div class="prob-row">
+                        <span class="prob-label">3rd Dozen</span>
+                        <div class="prob-bar"><div class="prob-fill dozen-fill" id="probD3" style="width:32.4%"></div></div>
+                        <span class="prob-value" id="probD3Val">32.4%</span>
+                    </div>
+                    <div class="prob-row">
+                        <span class="prob-label">High</span>
+                        <div class="prob-bar"><div class="prob-fill hl-fill" id="probHigh" style="width:48.6%"></div></div>
+                        <span class="prob-value" id="probHighVal">48.6%</span>
+                    </div>
+                    <div class="prob-row">
+                        <span class="prob-label">Low</span>
+                        <div class="prob-bar"><div class="prob-fill hl-fill" id="probLow" style="width:48.6%"></div></div>
+                        <span class="prob-value" id="probLowVal">48.6%</span>
+                    </div>
+                    <div class="prob-row">
+                        <span class="prob-label">Odd</span>
+                        <div class="prob-bar"><div class="prob-fill oe-fill" id="probOdd" style="width:48.6%"></div></div>
+                        <span class="prob-value" id="probOddVal">48.6%</span>
+                    </div>
+                    <div class="prob-row">
+                        <span class="prob-label">Even</span>
+                        <div class="prob-bar"><div class="prob-fill oe-fill" id="probEven" style="width:48.6%"></div></div>
+                        <span class="prob-value" id="probEvenVal">48.6%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Bankroll + Charts -->
+        <div class="right-column">
+            <!-- Session Control -->
+            <div class="card session-control-card">
+                <div class="session-primary-row">
+                    <button class="btn btn-session-start" id="startSession">▶ Start Session</button>
+                    <button class="btn btn-session-end hidden" id="endSession">■ End Session</button>
+                </div>
+                <div class="session-actions-row">
+                    <button class="btn btn-action btn-action-train" id="trainModel" title="Train AI from userdata/ files">🧠 Train AI</button>
+                    <button class="btn btn-action btn-action-import" id="importDataBtn" title="Import historical data">📥 Import Data</button>
+                    <button class="btn btn-action btn-action-test" id="testModeBtn" title="Test AI accuracy against known data">📊 Test Mode</button>
+                    <button class="btn btn-action btn-action-reset" id="resetAllBtn" title="Clear ALL training data and start completely fresh">🗑 Reset All</button>
+                </div>
+            </div>
+
+            <!-- Bankroll Panel -->
+            <div class="card bankroll-card">
+                <div class="card-header">
+                    <h2>Bankroll</h2>
+                </div>
+                <div class="bankroll-body">
+                    <div class="bankroll-main">
+                        <div class="bankroll-amount" id="bankrollAmount">$4,000.00</div>
+                        <div class="bankroll-pnl" id="bankrollPnl">$0.00</div>
+                    </div>
+                    <div class="bankroll-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">Target</span>
+                            <span class="stat-value" id="targetValue">$100</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Progress</span>
+                            <span class="stat-value" id="targetProgress">0%</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Win Rate</span>
+                            <span class="stat-value" id="winRate">0%</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Bets</span>
+                            <span class="stat-value" id="totalBets">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">W / L</span>
+                            <span class="stat-value" id="winLoss">0 / 0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Consec. Losses</span>
+                            <span class="stat-value" id="consecLosses">0</span>
+                        </div>
+                    </div>
+                    <!-- Target progress bar -->
+                    <div class="target-bar">
+                        <div class="target-fill" id="targetFill" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Model Status -->
+            <div class="card model-card">
+                <div class="card-header"><h2>AI Models</h2></div>
+                <div class="model-grid" id="modelGrid">
+                    <div class="model-item">
+                        <span class="model-name">Frequency</span>
+                        <span class="model-status" id="modelFreq">Idle</span>
+                    </div>
+                    <div class="model-item">
+                        <span class="model-name">Markov Chain</span>
+                        <span class="model-status" id="modelMarkov">Idle</span>
+                    </div>
+                    <div class="model-item">
+                        <span class="model-name">Pattern</span>
+                        <span class="model-status" id="modelPattern">Idle</span>
+                    </div>
+                    <div class="model-item">
+                        <span class="model-name">Neural Net (GRU)</span>
+                        <span class="model-status" id="modelLstm">Idle</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="card chart-card">
+                <div class="card-header">
+                    <h2>Bankroll Chart</h2>
+                </div>
+                <div class="chart-container">
+                    <canvas id="bankrollChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card chart-card">
+                <div class="card-header">
+                    <h2>Number Frequency</h2>
+                </div>
+                <div class="chart-container chart-container-lg">
+                    <canvas id="frequencyChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Spin History Table -->
+    <section class="history-section">
+        <div class="card">
+            <div class="card-header">
+                <h2>Spin History</h2>
+                <span class="spin-count" id="spinCount">0 spins</span>
+            </div>
+            <div class="table-wrapper">
+                <table class="history-table" id="historyTable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Number</th>
+                            <th>Color</th>
+                            <th>Prediction</th>
+                            <th>Confidence</th>
+                            <th>Mode</th>
+                            <th>Bet</th>
+                            <th>Result</th>
+                            <th>P&L</th>
+                            <th>Bankroll</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sessions Modal -->
+    <div class="modal-overlay hidden" id="sessionsModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Session History</h2>
+                <button class="btn btn-icon modal-close" id="closeModal">&times;</button>
+            </div>
+            <div class="modal-body" id="sessionsBody">
+                <p>Loading sessions...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Data Modal -->
+    <div class="modal-overlay hidden" id="importModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Import Historical Data</h2>
+                <button class="btn btn-icon modal-close" id="closeImportModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:12px;">
+                    Paste your roulette numbers below (one per line or comma-separated, 0-36).
+                    Or upload a .txt/.csv file.
+                </p>
+                <div style="margin-bottom:12px;">
+                    <label class="btn btn-secondary btn-sm" style="cursor:pointer;">
+                        Choose File
+                        <input type="file" id="importFile" accept=".txt,.csv" style="display:none;">
+                    </label>
+                    <span id="importFileName" style="font-size:0.8rem;color:var(--text-muted);margin-left:8px;">No file selected</span>
+                </div>
+                <textarea id="importTextarea" rows="12" placeholder="Paste numbers here, e.g.:&#10;13&#10;8&#10;22&#10;2&#10;5&#10;33&#10;...&#10;&#10;Or comma separated: 13,8,22,2,5,33" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;background:var(--bg-tertiary);color:var(--text-primary);font-family:var(--font-mono);font-size:0.85rem;resize:vertical;"></textarea>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;">
+                    <span id="importCount" style="font-size:0.8rem;color:var(--text-muted);">0 numbers detected</span>
+                    <div style="display:flex;gap:8px;">
+                        <button class="btn btn-secondary" id="importWithoutTraining" title="Load data into models but don't train Neural Net (use for fake/test data)">Import Without Training</button>
+                        <button class="btn btn-primary" id="importSubmit">Import & Train Models</button>
+                    </div>
+                </div>
+                <div class="hidden" id="importProgress" style="margin-top:12px;padding:12px;background:var(--bg-tertiary);border-radius:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <div class="spinner"></div>
+                        <span style="font-size:0.85rem;">Training models on imported data...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Test Mode Modal -->
+    <div class="modal-overlay hidden" id="testModal">
+        <div class="modal" style="max-width:800px;">
+            <div class="modal-header">
+                <h2>Test Mode - Validate AI Accuracy</h2>
+                <button class="btn btn-icon modal-close" id="closeTestModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:12px;">
+                    Feed a known dataset to test how well the AI predicts. The system will process each number sequentially, predict the next one, and show you the accuracy report.
+                </p>
+                <div style="display:flex;gap:12px;margin-bottom:12px;">
+                    <div style="flex:1;">
+                        <label class="btn btn-secondary btn-sm" style="cursor:pointer;">
+                            Choose File
+                            <input type="file" id="testFile" accept=".txt,.csv" style="display:none;">
+                        </label>
+                        <span id="testFileName" style="font-size:0.8rem;color:var(--text-muted);margin-left:8px;">No file selected</span>
+                    </div>
+                </div>
+                <textarea id="testTextarea" rows="8" placeholder="Paste test numbers here (one per line or comma-separated)&#10;&#10;The AI will predict each number and compare against the actual result..." style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;background:var(--bg-tertiary);color:var(--text-primary);font-family:var(--font-mono);font-size:0.85rem;resize:vertical;"></textarea>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;">
+                    <span id="testCount" style="font-size:0.8rem;color:var(--text-muted);">0 numbers detected</span>
+                    <button class="btn btn-primary" id="testSubmit" style="background:var(--warning);border-color:var(--warning);">Run Test</button>
+                </div>
+                <div class="hidden" id="testProgress" style="margin-top:12px;padding:12px;background:var(--bg-tertiary);border-radius:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <div class="spinner"></div>
+                        <span style="font-size:0.85rem;">Running test predictions...</span>
+                    </div>
+                </div>
+                <!-- Test Results -->
+                <div class="hidden" id="testResults" style="margin-top:16px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Initial Data Collection Modal (shown on Start Session) -->
+    <div class="modal-overlay hidden" id="initialDataModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Enter Initial Spin Data</h2>
+                <button class="btn btn-icon modal-close" id="closeInitialDataModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:8px;">
+                    Enter at least <strong>50 recent spins</strong> from this table/wheel before starting.
+                    This trains the AI so it can give you BET recommendations immediately.
+                </p>
+                <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:12px;">
+                    Tip: Look at the display board above the table — it usually shows the last 100+ results.
+                </p>
+
+                <!-- Live counter -->
+                <div class="initial-data-counter" id="initialDataCounter">
+                    <div class="counter-ring" id="counterRing">
+                        <svg viewBox="0 0 80 80">
+                            <circle class="counter-ring-bg" cx="40" cy="40" r="35" fill="none" stroke-width="6"/>
+                            <circle class="counter-ring-fill" id="counterRingFill" cx="40" cy="40" r="35" fill="none" stroke-width="6"
+                                stroke-dasharray="220" stroke-dashoffset="220"/>
+                        </svg>
+                        <div class="counter-number" id="counterNumber">0</div>
+                    </div>
+                    <div class="counter-info">
+                        <div class="counter-label" id="counterLabel">Numbers entered</div>
+                        <div class="counter-target">Target: 50 minimum</div>
+                        <div class="counter-status" id="counterStatus">Enter numbers to begin...</div>
+                    </div>
+                </div>
+
+                <!-- Input area -->
+                <textarea id="initialDataTextarea" rows="10" placeholder="Enter numbers here:&#10;&#10;One per line:&#10;13&#10;8&#10;22&#10;&#10;Or comma separated:&#10;13,8,22,2,5,33&#10;&#10;Or paste from display board..." style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;background:var(--bg-tertiary);color:var(--text-primary);font-family:var(--font-mono);font-size:0.9rem;resize:vertical;"></textarea>
+
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;">
+                    <div>
+                        <span id="initialDataCount" style="font-size:0.85rem;font-weight:600;color:var(--text-primary);">0 / 50 numbers</span>
+                    </div>
+                    <div style="display:flex;gap:8px;">
+                        <button class="btn btn-secondary btn-sm" id="skipInitialData">Skip</button>
+                        <button class="btn btn-secondary" id="startWithoutTraining" disabled title="Load data into models but don't train Neural Net (use for fake/test data)">Start Without Training</button>
+                        <button class="btn btn-primary btn-lg" id="startWithData" disabled>Start Session & Train AI</button>
+                    </div>
+                </div>
+
+                <!-- Training progress -->
+                <div class="hidden" id="initialDataProgress" style="margin-top:12px;padding:12px;background:var(--bg-tertiary);border-radius:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <div class="spinner"></div>
+                        <span style="font-size:0.85rem;" id="initialDataProgressText">Training AI on your data...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Training Results Modal -->
+    <div class="modal-overlay hidden" id="trainingModal">
+        <div class="modal" style="max-width:700px;">
+            <div class="modal-header">
+                <h2>🧠 AI Training Results</h2>
+                <button class="btn btn-icon modal-close" id="closeTrainingModal">&times;</button>
+            </div>
+            <div class="modal-body" id="trainingModalBody">
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <div class="spinner"></div>
+                    <span style="font-size:0.85rem;">Scanning userdata/ folder and training models...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast notification -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="/static/js/roulette-wheel.js"></script>
+    <script src="/static/js/charts.js"></script>
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
