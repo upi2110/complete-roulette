@@ -1,0 +1,226 @@
+{
+  "id": "20260219_071727",
+  "created_at": "2026-02-19T07:17:27.417450",
+  "updated_at": "2026-02-19T07:17:27.417452",
+  "status": "completed",
+  "spins": [
+    {
+      "spin_number": 1,
+      "actual_number": 13
+    },
+    {
+      "spin_number": 2,
+      "actual_number": 8
+    },
+    {
+      "spin_number": 3,
+      "actual_number": 22
+    },
+    {
+      "spin_number": 4,
+      "actual_number": 2
+    },
+    {
+      "spin_number": 5,
+      "actual_number": 5
+    },
+    {
+      "spin_number": 6,
+      "actual_number": 33
+    },
+    {
+      "spin_number": 7,
+      "actual_number": 8
+    },
+    {
+      "spin_number": 8,
+      "actual_number": 29
+    },
+    {
+      "spin_number": 9,
+      "actual_number": 10
+    },
+    {
+      "spin_number": 10,
+      "actual_number": 6
+    },
+    {
+      "spin_number": 11,
+      "actual_number": 28
+    },
+    {
+      "spin_number": 12,
+      "actual_number": 0
+    },
+    {
+      "spin_number": 13,
+      "actual_number": 0
+    },
+    {
+      "spin_number": 14,
+      "actual_number": 29
+    },
+    {
+      "spin_number": 15,
+      "actual_number": 8
+    },
+    {
+      "spin_number": 16,
+      "actual_number": 35
+    },
+    {
+      "spin_number": 17,
+      "actual_number": 29
+    },
+    {
+      "spin_number": 18,
+      "actual_number": 34
+    },
+    {
+      "spin_number": 19,
+      "actual_number": 23
+    },
+    {
+      "spin_number": 20,
+      "actual_number": 4
+    },
+    {
+      "spin_number": 21,
+      "actual_number": 11
+    },
+    {
+      "spin_number": 22,
+      "actual_number": 21
+    },
+    {
+      "spin_number": 23,
+      "actual_number": 32
+    },
+    {
+      "spin_number": 24,
+      "actual_number": 7
+    },
+    {
+      "spin_number": 25,
+      "actual_number": 15
+    },
+    {
+      "spin_number": 26,
+      "actual_number": 6
+    },
+    {
+      "spin_number": 27,
+      "actual_number": 25
+    },
+    {
+      "spin_number": 28,
+      "actual_number": 17
+    },
+    {
+      "spin_number": 29,
+      "actual_number": 0
+    },
+    {
+      "spin_number": 30,
+      "actual_number": 6
+    },
+    {
+      "spin_number": 31,
+      "actual_number": 9
+    },
+    {
+      "spin_number": 32,
+      "actual_number": 34
+    },
+    {
+      "spin_number": 33,
+      "actual_number": 0
+    },
+    {
+      "spin_number": 34,
+      "actual_number": 14
+    },
+    {
+      "spin_number": 35,
+      "actual_number": 5
+    },
+    {
+      "spin_number": 36,
+      "actual_number": 33
+    },
+    {
+      "spin_number": 37,
+      "actual_number": 5
+    },
+    {
+      "spin_number": 38,
+      "actual_number": 24
+    },
+    {
+      "spin_number": 39,
+      "actual_number": 16
+    },
+    {
+      "spin_number": 40,
+      "actual_number": 12
+    },
+    {
+      "spin_number": 41,
+      "actual_number": 16
+    },
+    {
+      "spin_number": 42,
+      "actual_number": 36
+    },
+    {
+      "spin_number": 43,
+      "actual_number": 18
+    },
+    {
+      "spin_number": 44,
+      "actual_number": 36
+    },
+    {
+      "spin_number": 45,
+      "actual_number": 35
+    },
+    {
+      "spin_number": 46,
+      "actual_number": 34
+    },
+    {
+      "spin_number": 47,
+      "actual_number": 7
+    },
+    {
+      "spin_number": 48,
+      "actual_number": 14
+    },
+    {
+      "spin_number": 49,
+      "actual_number": 31
+    },
+    {
+      "spin_number": 50,
+      "actual_number": 30
+    }
+  ],
+  "predictions": [],
+  "bets": [],
+  "bankroll_history": [],
+  "stats": {
+    "total_spins": 50,
+    "total_bets": 0,
+    "wins": 0,
+    "losses": 0,
+    "skips": 0,
+    "starting_bankroll": 4000,
+    "ending_bankroll": 4000,
+    "peak_bankroll": 4000,
+    "lowest_bankroll": 4000,
+    "max_consecutive_losses": 0,
+    "best_prediction_streak": 0,
+    "lstm_trained": false
+  },
+  "ended_at": "2026-02-19T07:17:27.417791"
+}

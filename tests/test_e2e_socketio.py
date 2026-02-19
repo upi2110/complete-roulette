@@ -594,8 +594,8 @@ class TestE2ERegression:
         finally:
             client.disconnect()
 
-    def test_incremental_betting_flow(self):
-        """Test the $1 incremental betting: 3 losses → higher bet, 2 wins → lower bet."""
+    def test_sequence_betting_flow(self):
+        """Test initial bet amount matches BASE_BET × step_0 × num_numbers (sequence strategy)."""
         client = SocketIOTestClient()
         try:
             client.connect(retries=8)
@@ -614,8 +614,13 @@ class TestE2ERegression:
 
             if pred_data.get('recommended_bet'):
                 initial_amount = pred_data['recommended_bet']['amount']
-                assert initial_amount == 1.0, \
-                    f"Initial bet should be $1, got ${initial_amount}"
+                from config import BASE_BET, BET_SEQUENCE
+                n_numbers = len(pred_data['prediction']['top_numbers'])
+                # Step 0: per_number = BASE_BET × BET_SEQUENCE[0], total = per_number × n_numbers
+                expected_total = BASE_BET * BET_SEQUENCE[0] * n_numbers
+                assert initial_amount == expected_total, \
+                    f"Initial total bet should be ${expected_total} " \
+                    f"(${BASE_BET}×{BET_SEQUENCE[0]}×{n_numbers}), got ${initial_amount}"
 
             client.emit('end_session')
             client.wait_for('session_ended', timeout=5)

@@ -1,0 +1,108 @@
+{
+  "id": "20260219_071855",
+  "created_at": "2026-02-19T07:18:55.715015",
+  "updated_at": "2026-02-19T07:18:57.881750",
+  "status": "completed",
+  "spins": [
+    {
+      "spin_number": 1,
+      "timestamp": "2026-02-19T07:18:57.881739",
+      "actual_number": 2,
+      "prediction": {
+        "top_numbers": [
+          14,
+          31,
+          9,
+          20,
+          1,
+          0,
+          32,
+          15,
+          26,
+          3,
+          34,
+          6
+        ],
+        "confidence": 70.4,
+        "mode": "BET_HIGH",
+        "suggested_color": "red",
+        "suggested_dozen": "1st"
+      },
+      "bet": {
+        "type": "straight",
+        "value": "12 numbers",
+        "amount": 36.0,
+        "per_number": 3.0,
+        "numbers": [
+          14,
+          31,
+          9,
+          20,
+          1,
+          0,
+          32,
+          15,
+          26,
+          3,
+          34,
+          6
+        ],
+        "won": false,
+        "payout": 0,
+        "net": -36.0
+      },
+      "bankroll": 3964.0
+    }
+  ],
+  "predictions": [
+    {
+      "spin": 1,
+      "confidence": 70.4,
+      "correct_number": false,
+      "mode": "BET_HIGH"
+    }
+  ],
+  "bets": [
+    {
+      "type": "straight",
+      "value": "12 numbers",
+      "amount": 36.0,
+      "per_number": 3.0,
+      "numbers": [
+        14,
+        31,
+        9,
+        20,
+        1,
+        0,
+        32,
+        15,
+        26,
+        3,
+        34,
+        6
+      ],
+      "won": false,
+      "payout": 0,
+      "net": -36.0
+    }
+  ],
+  "bankroll_history": [
+    3964.0
+  ],
+  "stats": {
+    "total_spins": 1,
+    "total_bets": 1,
+    "wins": 0,
+    "losses": 1,
+    "skips": 0,
+    "starting_bankroll": 4000,
+    "ending_bankroll": 3964.0,
+    "peak_bankroll": 4000,
+    "lowest_bankroll": 3964.0,
+    "max_consecutive_losses": 1,
+    "best_prediction_streak": 0,
+    "lstm_trained": false
+  },
+  "ended_at": "2026-02-19T07:18:57.945003"
+}

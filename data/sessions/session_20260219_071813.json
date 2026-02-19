@@ -1,0 +1,101 @@
+{
+  "id": "20260219_071813",
+  "created_at": "2026-02-19T07:18:13.672260",
+  "updated_at": "2026-02-19T07:18:17.942419",
+  "status": "completed",
+  "spins": [
+    {
+      "spin_number": 1,
+      "timestamp": "2026-02-19T07:18:15.770372",
+      "actual_number": 6,
+      "bankroll": 4000.0
+    },
+    {
+      "spin_number": 2,
+      "timestamp": "2026-02-19T07:18:16.861878",
+      "actual_number": 12,
+      "prediction": {
+        "top_numbers": [
+          6,
+          27,
+          13,
+          34,
+          17,
+          14,
+          31,
+          9,
+          20,
+          1,
+          0,
+          32
+        ],
+        "confidence": 80.6,
+        "mode": "BET_HIGH",
+        "suggested_color": "red",
+        "suggested_dozen": "1st"
+      },
+      "bankroll": 4000.0
+    },
+    {
+      "spin_number": 3,
+      "timestamp": "2026-02-19T07:18:17.942392",
+      "actual_number": 16,
+      "prediction": {
+        "top_numbers": [
+          6,
+          27,
+          13,
+          34,
+          17,
+          14,
+          31,
+          9,
+          20,
+          1,
+          0,
+          32
+        ],
+        "confidence": 74.7,
+        "mode": "BET_HIGH",
+        "suggested_color": "red",
+        "suggested_dozen": "1st"
+      },
+      "bankroll": 4000.0
+    }
+  ],
+  "predictions": [
+    {
+      "spin": 2,
+      "confidence": 80.6,
+      "correct_number": false,
+      "mode": "BET_HIGH"
+    },
+    {
+      "spin": 3,
+      "confidence": 74.7,
+      "correct_number": false,
+      "mode": "BET_HIGH"
+    }
+  ],
+  "bets": [],
+  "bankroll_history": [
+    4000.0,
+    4000.0,
+    4000.0
+  ],
+  "stats": {
+    "total_spins": 3,
+    "total_bets": 0,
+    "wins": 0,
+    "losses": 0,
+    "skips": 3,
+    "starting_bankroll": 4000,
+    "ending_bankroll": 4000.0,
+    "peak_bankroll": 4000,
+    "lowest_bankroll": 4000,
+    "max_consecutive_losses": 0,
+    "best_prediction_streak": 0,
+    "lstm_trained": false
+  },
+  "ended_at": "2026-02-19T07:18:19.032718"
+}

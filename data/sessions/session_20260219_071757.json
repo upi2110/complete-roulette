@@ -1,0 +1,108 @@
+{
+  "id": "20260219_071757",
+  "created_at": "2026-02-19T07:17:57.130639",
+  "updated_at": "2026-02-19T07:17:59.353533",
+  "status": "completed",
+  "spins": [
+    {
+      "spin_number": 1,
+      "timestamp": "2026-02-19T07:17:59.353523",
+      "actual_number": 14,
+      "prediction": {
+        "top_numbers": [
+          14,
+          31,
+          9,
+          20,
+          1,
+          0,
+          32,
+          15,
+          26,
+          3,
+          34,
+          6
+        ],
+        "confidence": 68.1,
+        "mode": "BET_HIGH",
+        "suggested_color": "red",
+        "suggested_dozen": "1st"
+      },
+      "bet": {
+        "type": "straight",
+        "value": "12 numbers",
+        "amount": 36.0,
+        "per_number": 3.0,
+        "numbers": [
+          14,
+          31,
+          9,
+          20,
+          1,
+          0,
+          32,
+          15,
+          26,
+          3,
+          34,
+          6
+        ],
+        "won": true,
+        "payout": 108.0,
+        "net": 72.0
+      },
+      "bankroll": 4072.0
+    }
+  ],
+  "predictions": [
+    {
+      "spin": 1,
+      "confidence": 68.1,
+      "correct_number": true,
+      "mode": "BET_HIGH"
+    }
+  ],
+  "bets": [
+    {
+      "type": "straight",
+      "value": "12 numbers",
+      "amount": 36.0,
+      "per_number": 3.0,
+      "numbers": [
+        14,
+        31,
+        9,
+        20,
+        1,
+        0,
+        32,
+        15,
+        26,
+        3,
+        34,
+        6
+      ],
+      "won": true,
+      "payout": 108.0,
+      "net": 72.0
+    }
+  ],
+  "bankroll_history": [
+    4072.0
+  ],
+  "stats": {
+    "total_spins": 1,
+    "total_bets": 1,
+    "wins": 1,
+    "losses": 0,
+    "skips": 0,
+    "starting_bankroll": 4000,
+    "ending_bankroll": 4072.0,
+    "peak_bankroll": 4072.0,
+    "lowest_bankroll": 4000,
+    "max_consecutive_losses": 0,
+    "best_prediction_streak": 0,
+    "lstm_trained": false
+  },
+  "ended_at": "2026-02-19T07:17:59.407765"
+}

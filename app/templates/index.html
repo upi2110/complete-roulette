@@ -103,11 +103,11 @@
                     <div class="prediction-bet-info hidden" id="predictionBetInfo">
                         <div class="bet-info-row">
                             <span class="bet-info-label">Per Number</span>
-                            <span class="bet-info-value" id="betPerNumber">$1.00</span>
+                            <span class="bet-info-value" id="betPerNumber">$3.00</span>
                         </div>
                         <div class="bet-info-row">
                             <span class="bet-info-label">Total Bet</span>
-                            <span class="bet-info-value bet-info-total" id="betTotal">$12.00</span>
+                            <span class="bet-info-value bet-info-total" id="betTotal">$36.00</span>
                         </div>
                         <div class="bet-info-row">
                             <span class="bet-info-label">Coverage</span>
@@ -333,6 +333,18 @@
                         <span class="model-name">Neural Net (GRU)</span>
                         <span class="model-status" id="modelLstm">Idle</span>
                     </div>
+                    <div class="model-item">
+                        <span class="model-name">Wheel Strategy</span>
+                        <span class="model-status" id="modelWheelStrategy">Idle</span>
+                    </div>
+                    <div class="model-item">
+                        <span class="model-name">Hot Number</span>
+                        <span class="model-status" id="modelHotNumber">Idle</span>
+                    </div>
+                    <div class="model-item signal-gate">
+                        <span class="model-name">Signal Gate</span>
+                        <span class="model-status" id="signalGate">—</span>
+                    </div>
                 </div>
             </div>
 
@@ -482,11 +494,11 @@
             </div>
             <div class="modal-body">
                 <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:8px;">
-                    Enter at least <strong>50 recent spins</strong> from this table/wheel before starting.
+                    Enter at least <strong>8 recent spins</strong> from this table/wheel before starting.
                     This trains the AI so it can give you BET recommendations immediately.
                 </p>
                 <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:12px;">
-                    Tip: Look at the display board above the table — it usually shows the last 100+ results.
+                    Tip: Look at the display board above the table — it usually shows the last 100+ results. More spins = better predictions.
                 </p>
 
                 <!-- Live counter -->
@@ -501,8 +513,8 @@
                     </div>
                     <div class="counter-info">
                         <div class="counter-label" id="counterLabel">Numbers entered</div>
-                        <div class="counter-target">Target: 50 minimum</div>
-                        <div class="counter-status" id="counterStatus">Enter numbers to begin...</div>
+                        <div class="counter-target">Target: 8 minimum</div>
+                        <div class="counter-status" id="counterStatus">Enter 8 numbers to begin...</div>
                     </div>
                 </div>
 
@@ -511,7 +523,7 @@
 
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;">
                     <div>
-                        <span id="initialDataCount" style="font-size:0.85rem;font-weight:600;color:var(--text-primary);">0 / 50 numbers</span>
+                        <span id="initialDataCount" style="font-size:0.85rem;font-weight:600;color:var(--text-primary);">0 / 8 numbers</span>
                     </div>
                     <div style="display:flex;gap:8px;">
                         <button class="btn btn-secondary btn-sm" id="skipInitialData">Skip</button>

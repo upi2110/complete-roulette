@@ -29,6 +29,8 @@ from config import (
     LOW_NUMBERS, HIGH_NUMBERS, ODD_NUMBERS, EVEN_NUMBERS,
     ENSEMBLE_FREQUENCY_WEIGHT, ENSEMBLE_MARKOV_WEIGHT,
     ENSEMBLE_PATTERN_WEIGHT, ENSEMBLE_LSTM_WEIGHT,
+    ENSEMBLE_WHEEL_STRATEGY_WEIGHT, ENSEMBLE_HOT_NUMBER_WEIGHT,
+    ENSEMBLE_GAP_WEIGHT, ENSEMBLE_TAB_STREAK_WEIGHT,
     CONFIDENCE_STRAIGHT_THRESHOLD, CONFIDENCE_HIGH_THRESHOLD,
     CONFIDENCE_BET_THRESHOLD, RETRAIN_INTERVAL,
     TOP_PREDICTIONS_COUNT, TOP_PREDICTIONS_MAX, NEIGHBOURS_PER_ANCHOR,
@@ -39,6 +41,7 @@ from config import (
     ADAPTIVE_MIN_OBSERVATIONS,
     REGIME_RECENT_WINDOW, REGIME_BASELINE_WINDOW, REGIME_KL_THRESHOLD,
     CONSECUTIVE_MISS_THRESHOLD, EXPLORATION_BOOST_FACTOR, SECTOR_COOLDOWN_WINDOW,
+    CONDITIONAL_BET_THRESHOLD,
     get_number_color
 )
 
@@ -46,6 +49,10 @@ from app.ml.frequency_analyzer import FrequencyAnalyzer
 from app.ml.markov_chain import MarkovChain
 from app.ml.pattern_detector import PatternDetector
 from app.ml.lstm_predictor import LSTMPredictor
+from app.ml.wheel_strategy import WheelStrategyAnalyzer
+from app.ml.hot_number import HotNumberAnalyzer
+from app.ml.gap_analyzer import GapAnalyzer
+from app.ml.tab_streak_analyzer import TabStreakAnalyzer
 from app.ml.confidence import ConfidenceEngine
 
 
@@ -58,7 +65,7 @@ class ModelPerformanceTracker:
     to actual outcomes get higher adaptive weights.
     """
 
-    MODEL_NAMES = ('frequency', 'markov', 'patterns', 'lstm')
+    MODEL_NAMES = ('frequency', 'markov', 'patterns', 'lstm', 'wheel_strategy', 'hot_number', 'gap', 'tab_streak')
 
     def __init__(self, window=ADAPTIVE_WINDOW):
         self.model_scores = {
@@ -89,6 +96,10 @@ class ModelPerformanceTracker:
             'markov': ENSEMBLE_MARKOV_WEIGHT,
             'patterns': ENSEMBLE_PATTERN_WEIGHT,
             'lstm': ENSEMBLE_LSTM_WEIGHT,
+            'wheel_strategy': ENSEMBLE_WHEEL_STRATEGY_WEIGHT,
+            'hot_number': ENSEMBLE_HOT_NUMBER_WEIGHT,
+            'gap': ENSEMBLE_GAP_WEIGHT,
+            'tab_streak': ENSEMBLE_TAB_STREAK_WEIGHT,
         }
 
         # Need minimum observations before switching to adaptive
@@ -222,6 +233,10 @@ class EnsemblePredictor:
         self.markov = MarkovChain()
         self.patterns = PatternDetector()
         self.lstm = LSTMPredictor()
+        self.wheel_strategy = WheelStrategyAnalyzer()
+        self.hot_number = HotNumberAnalyzer()
+        self.gap = GapAnalyzer()
+        self.tab_streak = TabStreakAnalyzer()
         self.confidence_engine = ConfidenceEngine()
 
         # Adaptive components
@@ -244,6 +259,10 @@ class EnsemblePredictor:
         self.markov = MarkovChain()
         self.patterns = PatternDetector()
         self.lstm = LSTMPredictor()
+        self.wheel_strategy = WheelStrategyAnalyzer()
+        self.hot_number = HotNumberAnalyzer()
+        self.gap = GapAnalyzer()
+        self.tab_streak = TabStreakAnalyzer()
         self.confidence_engine = ConfidenceEngine()
         self.performance_tracker = ModelPerformanceTracker()
         self.regime_detector = RegimeDetector()
@@ -278,6 +297,10 @@ class EnsemblePredictor:
         self.markov.load_history(history)
         self.patterns.load_history(history)
         self.lstm.load_history(history)
+        self.wheel_strategy.load_history(history)
+        self.hot_number.load_history(history)
+        self.gap.load_history(history)
+        self.tab_streak.load_history(history)
 
     def update(self, number):
         """Feed a new spin result to all models.
@@ -289,6 +312,10 @@ class EnsemblePredictor:
         self.markov.update(number)
         self.patterns.update(number)
         self.lstm.update(number)
+        self.wheel_strategy.update(number)
+        self.hot_number.update(number)
+        self.gap.update(number)
+        self.tab_streak.update(number)
 
         # Record per-model prediction accuracy for adaptive weighting
         if self._last_model_distributions is not None:
@@ -347,6 +374,10 @@ class EnsemblePredictor:
         markov_probs = self.markov.get_probabilities()
         pattern_probs = self.patterns.get_number_probabilities()
         lstm_probs = self.lstm.predict()
+        wheel_probs = self.wheel_strategy.get_number_probabilities()
+        hot_probs = self.hot_number.get_number_probabilities()
+        gap_probs = self.gap.get_number_probabilities()
+        tab_streak_probs = self.tab_streak.get_number_probabilities()
 
         # Cache individual distributions for performance tracking on next update
         self._last_model_distributions = {
@@ -354,6 +385,10 @@ class EnsemblePredictor:
             'markov': markov_probs,
             'patterns': pattern_probs,
             'lstm': lstm_probs,
+            'wheel_strategy': wheel_probs,
+            'hot_number': hot_probs,
+            'gap': gap_probs,
+            'tab_streak': tab_streak_probs,
         }
 
         # Get weights — adaptive if enough data, else config defaults
@@ -362,22 +397,34 @@ class EnsemblePredictor:
         markov_w = weights['markov']
         pattern_w = weights['patterns']
         lstm_weight = weights['lstm']
+        wheel_w = weights['wheel_strategy']
+        hot_w = weights['hot_number']
+        gap_w = weights['gap']
+        tab_streak_w = weights['tab_streak']
 
         # If LSTM isn't trained, redistribute its weight among others
         if not self.lstm.is_trained:
             redistrib = lstm_weight
             lstm_weight = 0
-            total_other = freq_w + markov_w + pattern_w
+            total_other = freq_w + markov_w + pattern_w + wheel_w + hot_w + gap_w + tab_streak_w
             if total_other > 0:
                 freq_w += redistrib * (freq_w / total_other)
                 markov_w += redistrib * (markov_w / total_other)
                 pattern_w += redistrib * (pattern_w / total_other)
+                wheel_w += redistrib * (wheel_w / total_other)
+                hot_w += redistrib * (hot_w / total_other)
+                gap_w += redistrib * (gap_w / total_other)
+                tab_streak_w += redistrib * (tab_streak_w / total_other)
 
         ensemble = (
             freq_probs * freq_w +
             markov_probs * markov_w +
             pattern_probs * pattern_w +
-            lstm_probs * lstm_weight
+            lstm_probs * lstm_weight +
+            wheel_probs * wheel_w +
+            hot_probs * hot_w +
+            gap_probs * gap_w +
+            tab_streak_probs * tab_streak_w
         )
 
         # Normalize
@@ -408,102 +455,40 @@ class EnsemblePredictor:
             ensemble = (1 - exploration) * ensemble * cold_boost + exploration * uniform
             ensemble /= ensemble.sum()
 
-        return ensemble, [freq_probs, markov_probs, pattern_probs, lstm_probs]
+        return ensemble, [freq_probs, markov_probs, pattern_probs, lstm_probs, wheel_probs, hot_probs, gap_probs, tab_streak_probs]
 
     def _get_group_probability(self, probs, number_set):
         """Sum probabilities for a group of numbers."""
         return sum(probs[n] for n in number_set if n < len(probs))
 
-    def _smart_anchor_selection(self, ensemble_probs, all_sorted, wheel_len):
-        """Dynamic AI-driven prediction selection.
+    def _top_n_selection(self, ensemble_probs, all_sorted):
+        """Pure top-N selection by probability — no wheel grouping.
 
-        The AI decides how many numbers to predict based on probability strength:
-          1. Select all numbers above the confidence threshold (≥ 1.2× uniform)
-          2. For each selected number, include its ±2 wheel neighbours
-          3. Group into natural wheel clusters for display
-          4. No fixed anchor count — could be 2 anchors or 6, AI decides
+        Simply picks the N numbers with the highest ensemble probability.
+        Backtest showed this beats anchor+neighbour by +0.80% hit rate
+        and +$1,400 profit over 2,528 spins.
 
-        Returns: (anchors, top_numbers, top_probs, anchor_details)
-          anchor_details = [{number, spread, numbers_covered}, ...]
+        Returns: (top_numbers, top_probs, anchor_details)
+          anchor_details kept for backward-compat UI (each number is its own 'anchor')
         """
-        neighbours_per_side = NEIGHBOURS_PER_ANCHOR  # 2
-        max_budget = TOP_PREDICTIONS_MAX  # 20 safety cap
-        uniform = 1.0 / TOTAL_NUMBERS
-        threshold = uniform * PREDICTION_CONFIDENCE_FACTOR
+        max_budget = TOP_PREDICTIONS_MAX
 
-        # Step 1: Find all numbers the AI is confident about
-        confident_nums = []
-        for idx in all_sorted:
-            num = int(idx)
-            if ensemble_probs[num] >= threshold:
-                confident_nums.append(num)
-            else:
-                break  # sorted descending, so stop once below threshold
-
-        # Ensure at least 3 numbers, cap at max_budget
-        if len(confident_nums) < 3:
-            confident_nums = [int(all_sorted[i]) for i in range(min(3, len(all_sorted)))]
-        if len(confident_nums) > max_budget:
-            confident_nums = confident_nums[:max_budget]
-
-        # Step 2: Build anchor groups from confident numbers
-        # Each confident number becomes a potential anchor — merge if they're
-        # within ±(neighbours_per_side) on the wheel
-        selected = set()
-        anchors = []
-        anchor_details = []
         top_numbers = []
         top_probs = []
+        anchor_details = []
 
-        # Sort confident nums by probability (highest first)
-        confident_nums.sort(key=lambda n: ensemble_probs[n], reverse=True)
-
-        for num in confident_nums:
-            if num in selected:
-                continue
-            if len(top_numbers) >= max_budget:
-                break
-
-            pos = NUMBER_TO_POSITION.get(num, -1)
-            if pos < 0:
-                continue
-
-            # Check if this number is already covered by an existing anchor's neighbours
-            already_covered = False
-            for ad in anchor_details:
-                if num in ad['numbers']:
-                    already_covered = True
-                    break
-            if already_covered:
-                continue
-
-            # This is a new anchor
-            group = [num]
-            selected.add(num)
-
-            # Add ±neighbours_per_side wheel neighbours
-            for direction in [1, -1]:
-                for reach in range(1, neighbours_per_side + 1):
-                    if len(top_numbers) + len(group) >= max_budget:
-                        break
-                    nb_pos = (pos + direction * reach) % wheel_len
-                    nb_num = WHEEL_ORDER[nb_pos]
-                    if nb_num not in selected:
-                        group.append(nb_num)
-                        selected.add(nb_num)
-
-            anchors.append(num)
-            for n in group:
-                top_numbers.append(n)
-                top_probs.append(round(float(ensemble_probs[n]), 4))
-
+        for i in range(min(max_budget, len(all_sorted))):
+            num = int(all_sorted[i])
+            prob = round(float(ensemble_probs[num]), 4)
+            top_numbers.append(num)
+            top_probs.append(prob)
             anchor_details.append({
                 'number': num,
-                'spread': neighbours_per_side,
-                'numbers': list(group)
+                'spread': 0,
+                'numbers': [num]
             })
 
-        return anchors, top_numbers, top_probs, anchor_details
+        return top_numbers, top_probs, anchor_details
 
     def predict(self):
         """Generate full prediction with bet suggestions."""
@@ -511,15 +496,14 @@ class EnsemblePredictor:
 
         ensemble_probs, all_distributions = self.get_ensemble_probabilities()
 
-        # Smart Anchor Selection: maximise wheel coverage with minimal overlap.
-        # Instead of naively picking top 4, detect clusters of adjacent high-prob
-        # numbers on the wheel and place anchors to cover them efficiently.
+        # Pure top-N selection: pick the 12 highest-probability numbers.
+        # Backtest showed this beats anchor+neighbour grouping by +$1,400.
         all_sorted = np.argsort(ensemble_probs)[::-1]  # descending probability
-        wheel_len = len(WHEEL_ORDER)
 
-        anchors, top_numbers, top_probs, anchor_details = self._smart_anchor_selection(
-            ensemble_probs, all_sorted, wheel_len
+        top_numbers, top_probs, anchor_details = self._top_n_selection(
+            ensemble_probs, all_sorted
         )
+        anchors = list(top_numbers)  # Every number is its own anchor
 
         # Group probabilities
         red_prob = self._get_group_probability(ensemble_probs, RED_NUMBERS)
@@ -567,6 +551,11 @@ class EnsemblePredictor:
         # Adaptive weight info
         adaptive_weights = self.performance_tracker.get_adaptive_weights()
 
+        # Conditional betting: check if wheel signal is strong enough to bet
+        wheel_strength = self.wheel_strategy.get_strategy_strength()
+        should_bet = (CONDITIONAL_BET_THRESHOLD == 0 or
+                      wheel_strength >= CONDITIONAL_BET_THRESHOLD)
+
         prediction = {
             'spin_number': self.prediction_count,
             'top_numbers': top_numbers,
@@ -577,6 +566,9 @@ class EnsemblePredictor:
             'confidence_breakdown': confidence_data,
             'mode': mode,
             'bets': bets,
+            'should_bet': should_bet,
+            'signal_strength': round(wheel_strength, 1),
+            'signal_threshold': CONDITIONAL_BET_THRESHOLD,
             'group_probabilities': {
                 'red': float(round(red_prob, 4)),
                 'black': float(round(black_prob, 4)),
@@ -604,6 +596,8 @@ class EnsemblePredictor:
                 'bias_score': self.frequency.get_bias_score()
             },
             'markov_strength': self.markov.get_transition_strength(),
+            'wheel_strategy': self.wheel_strategy.get_summary(),
+            'hot_number_summary': self.hot_number.get_summary(),
             'regime': regime_info,
             'adaptive_weights': {
                 k: round(v, 3) for k, v in adaptive_weights.items()
@@ -689,6 +683,18 @@ class EnsemblePredictor:
         # For LSTM: train on all data (it learns sequences within its window)
         self.lstm.load_history(all_spins)
 
+        # For Wheel Strategy: use all data (tracks sector trends)
+        self.wheel_strategy.load_history(all_spins)
+
+        # For Hot Number: use all data (tracks recent repeats)
+        self.hot_number.load_history(all_spins)
+
+        # For Gap Analyzer: use all data (tracks number gaps)
+        self.gap.load_history(all_spins)
+
+        # For Tab Streak: use all data (tracks table-side streaks)
+        self.tab_streak.load_history(all_spins)
+
         # Keep combined history for reference
         self.spin_history = all_spins
 
@@ -704,6 +710,9 @@ class EnsemblePredictor:
         what models have already learned. Used for data imports during
         an active session.
 
+        Uses bulk load_history() for speed — rebuilds all models from
+        the combined history instead of feeding one number at a time.
+
         NOTE: Does NOT auto-retrain LSTM. The caller (import handler)
         decides whether to train based on user's button choice.
 
@@ -712,20 +721,30 @@ class EnsemblePredictor:
         Returns:
             dict with update stats
         """
-        added = 0
-        for num in numbers:
-            self.spin_history.append(num)
-            self.frequency.update(num)
-            self.markov.update(num)
-            self.patterns.update(num)
-            self.lstm.update(num)
-            added += 1
-            # Yield to event loop periodically to keep WebSocket heartbeats alive
-            if added % 20 == 0:
-                _sleep(0)
+        # Append new numbers to master history
+        self.spin_history.extend(numbers)
+        _sleep(0)
+
+        # Bulk reload all models from combined history (much faster than one-by-one)
+        self.frequency.load_history(self.spin_history)
+        _sleep(0)
+        self.markov.load_history(self.spin_history)
+        _sleep(0)
+        self.patterns.load_history(self.spin_history)
+        _sleep(0)
+        self.lstm.load_history(self.spin_history)
+        _sleep(0)
+        self.wheel_strategy.load_history(self.spin_history)
+        _sleep(0)
+        self.hot_number.load_history(self.spin_history)
+        _sleep(0)
+        self.gap.load_history(self.spin_history)
+        _sleep(0)
+        self.tab_streak.load_history(self.spin_history)
+        _sleep(0)
 
         return {
-            'numbers_added': added,
+            'numbers_added': len(numbers),
             'total_spins': len(self.spin_history),
             'mode': 'incremental'
         }
@@ -742,6 +761,10 @@ class EnsemblePredictor:
         self.markov.load_history(self.spin_history)
         self.patterns.load_history(self.spin_history)
         self.lstm.load_history(self.spin_history)
+        self.wheel_strategy.load_history(self.spin_history)
+        self.hot_number.load_history(self.spin_history)
+        self.gap.load_history(self.spin_history)
+        self.tab_streak.load_history(self.spin_history)
 
         self.last_prediction = None
         return removed
@@ -898,6 +921,34 @@ class EnsemblePredictor:
                            else 'idle'),
                 'weight': round(weights['lstm'], 3),
             },
+            'wheel_strategy': {
+                'spins': total_spins,
+                'strength': self.wheel_strategy.get_strategy_strength(),
+                'status': 'active' if total_spins >= 5 else 'idle',
+                'weight': round(weights['wheel_strategy'], 3),
+                'summary': self.wheel_strategy.get_summary() if total_spins >= 5 else None,
+            },
+            'hot_number': {
+                'spins': total_spins,
+                'strength': self.hot_number.get_strength(),
+                'status': 'active' if total_spins >= 15 else 'idle',
+                'weight': round(weights['hot_number'], 3),
+                'summary': self.hot_number.get_summary() if total_spins >= 15 else None,
+            },
+            'gap': {
+                'spins': total_spins,
+                'strength': self.gap.get_strength(),
+                'status': 'active' if total_spins >= 50 else 'idle',
+                'weight': round(weights['gap'], 3),
+                'summary': self.gap.get_summary() if total_spins >= 50 else None,
+            },
+            'tab_streak': {
+                'spins': total_spins,
+                'strength': self.tab_streak.get_strength(),
+                'status': 'active' if total_spins >= 100 else 'idle',
+                'weight': round(weights['tab_streak'], 3),
+                'summary': self.tab_streak.get_summary() if total_spins >= 100 else None,
+            },
             'adaptive_weights_active': using_adaptive,
             'performance_observations': self.performance_tracker.observation_count,
         }
@@ -963,6 +1014,22 @@ class EnsemblePredictor:
                     if hasattr(self.confidence_engine, 'get_calibration_state')
                     else {}
                 ),
+                # Wheel Strategy
+                'wheel_strategy': {
+                    'spin_history': list(self.wheel_strategy.spin_history),
+                },
+                # Hot Number
+                'hot_number': {
+                    'spin_history': list(self.hot_number.spin_history),
+                },
+                # Gap Analyzer (V3 dominant model)
+                'gap': {
+                    'spin_history': list(self.gap.spin_history),
+                },
+                # Tab Streak Analyzer (V3 breakthrough model)
+                'tab_streak': {
+                    'spin_history': list(self.tab_streak.spin_history),
+                },
                 # Loss-reactive strategy state
                 'consecutive_misses': self.consecutive_misses,
                 'sector_miss_counts': dict(self.sector_miss_counts),
@@ -1027,6 +1094,31 @@ class EnsemblePredictor:
                 self.confidence_engine.category_accuracy[cat_key] = deque(
                     cat_data, maxlen=50
                 )
+
+            # Restore Wheel Strategy
+            if 'wheel_strategy' in state:
+                self.wheel_strategy.load_history(state['wheel_strategy']['spin_history'])
+
+            # Restore Hot Number
+            if 'hot_number' in state:
+                self.hot_number.load_history(state['hot_number']['spin_history'])
+            else:
+                # Backward compat: initialize from ensemble spin_history
+                self.hot_number.load_history(state['ensemble']['spin_history'])
+
+            # Restore Gap Analyzer
+            if 'gap' in state:
+                self.gap.load_history(state['gap']['spin_history'])
+            else:
+                # Backward compat: initialize from ensemble spin_history
+                self.gap.load_history(state['ensemble']['spin_history'])
+
+            # Restore Tab Streak Analyzer
+            if 'tab_streak' in state:
+                self.tab_streak.load_history(state['tab_streak']['spin_history'])
+            else:
+                # Backward compat: initialize from ensemble spin_history
+                self.tab_streak.load_history(state['ensemble']['spin_history'])
 
             # Restore EnsemblePredictor
             ens = state['ensemble']

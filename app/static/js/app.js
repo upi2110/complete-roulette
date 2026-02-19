@@ -633,7 +633,7 @@ class App {
         const text = document.getElementById('initialDataTextarea').value;
         const numbers = this._parseNumbers(text);
         const count = numbers.length;
-        const target = 50;
+        const target = 8;
 
         // Update counter number
         document.getElementById('counterNumber').textContent = count;
@@ -652,18 +652,18 @@ class App {
         statusEl.classList.remove('needs-more', 'almost', 'ready', 'excellent');
 
         if (count === 0) {
-            statusEl.textContent = 'Enter numbers to begin...';
-            statusEl.classList.add('needs-more');
-        } else if (count < 20) {
-            statusEl.textContent = `Need ${target - count} more numbers`;
+            statusEl.textContent = 'Enter 8 numbers to begin...';
             statusEl.classList.add('needs-more');
         } else if (count < target) {
-            ring.classList.add('warning');
-            statusEl.textContent = `${target - count} more for best results`;
-            statusEl.classList.add('almost');
-        } else if (count < 100) {
+            statusEl.textContent = `Need ${target - count} more numbers`;
+            statusEl.classList.add('needs-more');
+        } else if (count < 20) {
             ring.classList.add('ready');
             statusEl.textContent = 'Ready to start!';
+            statusEl.classList.add('ready');
+        } else if (count < 50) {
+            ring.classList.add('ready');
+            statusEl.textContent = `Good! ${count} spins loaded`;
             statusEl.classList.add('ready');
         } else {
             ring.classList.add('ready');
@@ -671,9 +671,9 @@ class App {
             statusEl.classList.add('excellent');
         }
 
-        // Enable/disable start buttons (minimum 5 numbers to start)
-        document.getElementById('startWithData').disabled = count < 5;
-        document.getElementById('startWithoutTraining').disabled = count < 5;
+        // Enable/disable start buttons (minimum 8 numbers to start)
+        document.getElementById('startWithData').disabled = count < target;
+        document.getElementById('startWithoutTraining').disabled = count < target;
     }
 
     _parseNumbers(text) {
@@ -1095,71 +1095,43 @@ class App {
             document.getElementById('betWinPayout').textContent = '35:1';
         } else {
             decisionDiv.className = 'prediction-decision wait';
-            decisionLabel.textContent = 'WAIT';
+            decisionLabel.textContent = data.signal_gated ? 'SKIP' : 'WAIT';
             decisionDetail.textContent = data.bet_reason || `Confidence ${confidence}% below threshold`;
             betInfoDiv.classList.add('hidden');
         }
 
-        // Top predicted numbers grouped by anchor with spread info
-        const anchorDetails = pred.anchor_details || [];
-        const anchorsSet = new Set((pred.anchors || []).map(n => parseInt(n)));
-
-        // Build a lookup: number → anchor detail for spread label
-        const numToAnchor = {};
-        for (const ad of anchorDetails) {
-            for (const n of (ad.numbers || [])) {
-                numToAnchor[parseInt(n)] = ad;
+        // Update Signal Gate indicator
+        const signalGateEl = document.getElementById('signalGate');
+        if (signalGateEl && pred.signal_strength !== undefined) {
+            const str = pred.signal_strength;
+            const thresh = pred.signal_threshold || 0;
+            if (thresh === 0) {
+                signalGateEl.textContent = `Off`;
+                signalGateEl.className = 'model-status idle';
+            } else if (str >= thresh) {
+                signalGateEl.textContent = `BET ✓ (${str}/${thresh})`;
+                signalGateEl.className = 'model-status active';
+            } else {
+                signalGateEl.textContent = `SKIP (${str}/${thresh})`;
+                signalGateEl.className = 'model-status idle';
             }
         }
 
+        // Top predicted numbers — flat list ranked by probability
         const topDiv = document.getElementById('topNumbers');
         if (pred.top_numbers && pred.top_numbers.length > 0) {
-            // Group numbers by anchor for display
-            let html = '';
-            const rendered = new Set();
-
-            // Render anchor groups first
-            for (const ad of anchorDetails) {
-                const anchorNum = parseInt(ad.number);
-                const spread = ad.spread || 1;
-                const groupNums = (ad.numbers || []).map(n => parseInt(n));
-
-                html += `<div class="anchor-group">`;
-                html += `<div class="anchor-group-label">${anchorNum} <span class="spread-badge">\u00b1${spread}</span></div>`;
-                html += `<div class="anchor-group-numbers">`;
-                for (const num of groupNums) {
-                    const isAnchor = num === anchorNum;
-                    const roleClass = isAnchor ? 'anchor' : 'neighbour';
-                    const idx = pred.top_numbers.indexOf(num);
-                    const prob = idx >= 0 ? (pred.top_probabilities[idx] * 100).toFixed(1) : '?';
-                    html += `
-                        <div class="pred-number">
-                            <div class="pred-num-circle ${getNumberColor(num)} ${roleClass}">${num}</div>
-                            <span class="pred-prob">${prob}%</span>
-                        </div>`;
-                    rendered.add(num);
-                }
-                html += `</div></div>`;
+            let html = '<div class="anchor-group"><div class="anchor-group-label">Top ' + pred.top_numbers.length + ' by Probability</div><div class="anchor-group-numbers">';
+            for (let i = 0; i < pred.top_numbers.length; i++) {
+                const num = parseInt(pred.top_numbers[i]);
+                const prob = (pred.top_probabilities[i] * 100).toFixed(1);
+                const rankClass = i < 3 ? 'anchor' : 'neighbour';  // Top 3 highlighted
+                html += `
+                    <div class="pred-number">
+                        <div class="pred-num-circle ${getNumberColor(num)} ${rankClass}">${num}</div>
+                        <span class="pred-prob">${prob}%</span>
+                    </div>`;
             }
-
-            // Render any remaining numbers not in anchor groups
-            const remaining = pred.top_numbers.filter(n => !rendered.has(parseInt(n)));
-            if (remaining.length > 0) {
-                html += `<div class="anchor-group">`;
-                html += `<div class="anchor-group-label">Extra</div>`;
-                html += `<div class="anchor-group-numbers">`;
-                for (const num of remaining) {
-                    const idx = pred.top_numbers.indexOf(num);
-                    const prob = idx >= 0 ? (pred.top_probabilities[idx] * 100).toFixed(1) : '?';
-                    html += `
-                        <div class="pred-number">
-                            <div class="pred-num-circle ${getNumberColor(num)} neighbour">${num}</div>
-                            <span class="pred-prob">${prob}%</span>
-                        </div>`;
-                }
-                html += `</div></div>`;
-            }
-
+            html += '</div></div>';
             topDiv.innerHTML = html;
 
             // Highlight predicted numbers + anchors on the wheel
@@ -1204,7 +1176,11 @@ class App {
                 betSizeEl.style.color = 'var(--success)';
             }
         } else {
-            if (data.bet_reason && data.bet_reason.includes('TARGET')) {
+            if (data.signal_gated) {
+                const sig = pred.signal_strength || 0;
+                const thresh = pred.signal_threshold || 0;
+                this.setMode('wait', 'SKIP', `Signal weak (${sig}/${thresh}) — wait for stronger trend${explorationSuffix}`);
+            } else if (data.bet_reason && data.bet_reason.includes('TARGET')) {
                 this.setMode('danger', 'TARGET REACHED', data.bet_reason);
             } else if (data.bet_reason && data.bet_reason.includes('STOP_LOSS')) {
                 this.setMode('danger', 'STOP LOSS', data.bet_reason);
@@ -1213,9 +1189,9 @@ class App {
             } else {
                 this.setMode('wait', 'WAIT', (data.bet_reason || `Confidence ${confidence}% below threshold`) + explorationSuffix);
             }
-            // Show WAIT in sticky input bar
+            // Show WAIT/SKIP in sticky input bar
             if (betSizeEl) {
-                betSizeEl.textContent = 'WAIT';
+                betSizeEl.textContent = data.signal_gated ? 'SKIP' : 'WAIT';
                 betSizeEl.style.color = 'var(--warning)';
             }
         }
@@ -1426,6 +1402,47 @@ class App {
         } else {
             setStatus('modelLstm', 'idle', 'Idle — No data');
         }
+
+        if (models.wheel_strategy) {
+            if (models.wheel_strategy.status === 'idle') {
+                setStatus('modelWheelStrategy', 'idle', 'Idle — No data');
+            } else {
+                const ws = models.wheel_strategy;
+                const summary = ws.summary;
+                let detail = `Str: ${ws.strength}`;
+                if (summary) {
+                    const parts = [];
+                    if (summary.table_trend && summary.table_trend.hot_table) {
+                        parts.push(`T${summary.table_trend.hot_table}`);
+                    }
+                    if (summary.polarity_trend && summary.polarity_trend.hot_polarity) {
+                        parts.push(summary.polarity_trend.hot_polarity === 'positive' ? 'P+' : 'P-');
+                    }
+                    if (summary.set_trend && summary.set_trend.hot_set) {
+                        parts.push(`S${summary.set_trend.hot_set}`);
+                    }
+                    if (parts.length) {
+                        detail += ` [${parts.join(',')}]`;
+                    }
+                }
+                setStatus('modelWheelStrategy', 'active', `Active (${detail}) — ${ws.spins} spins`);
+            }
+        }
+
+        // Hot Number model
+        if (models.hot_number) {
+            if (models.hot_number.status === 'idle') {
+                setStatus('modelHotNumber', 'idle', 'Idle — Need 15+ spins');
+            } else {
+                const hn = models.hot_number;
+                let detail = `Str: ${hn.strength}`;
+                if (hn.summary && hn.summary.hot_numbers && hn.summary.hot_numbers.length) {
+                    const hotNums = hn.summary.hot_numbers.slice(0, 3).map(h => h.number).join(',');
+                    detail += ` [${hotNums}]`;
+                }
+                setStatus('modelHotNumber', 'active', `Active (${detail}) — ${hn.spins} spins`);
+            }
+        }
     }
 
     updateLastNumbers(numbers) {
@@ -1498,16 +1515,11 @@ class App {
         }
 
         const prevPred = this.lastPrediction;
-        // Show anchors with spread in prediction column (e.g., "21±2, 5±1, 33±1")
+        // Show top predicted numbers in history table
         let predNums = '-';
-        if (prevPred && prevPred.anchor_details && prevPred.anchor_details.length > 0) {
-            predNums = prevPred.anchor_details.map(ad =>
-                `${ad.number}\u00b1${ad.spread}`
-            ).join(', ');
-        } else if (prevPred && prevPred.anchors) {
-            predNums = prevPred.anchors.join(', ');
-        } else if (prevPred && prevPred.top_numbers) {
-            predNums = prevPred.top_numbers.slice(0, 4).join(', ');
+        if (prevPred && prevPred.top_numbers && prevPred.top_numbers.length > 0) {
+            predNums = prevPred.top_numbers.slice(0, 6).join(', ');
+            if (prevPred.top_numbers.length > 6) predNums += '...';
         }
         const predConf = prevPred ? `${prevPred.confidence}%` : '-';
         const predMode = prevPred ? prevPred.mode : '-';

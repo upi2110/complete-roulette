@@ -1,15 +1,14 @@
 """
-Bankroll Manager - Modified Kelly Criterion, consecutive loss protection,
-progressive bet sizing, session target management, and comprehensive betting advisor.
+Bankroll Manager - THE ONE Strategy (1-3-2-6 Sequence Variant).
 
 Money Management Strategy:
-- Modified Kelly Criterion for bet sizing (Quarter-Kelly for safety)
-- Consecutive loss protection (max 2 losses → forced 3-spin wait)
-- Recovery mode with gradual bet increase after losses
-- Protection mode when bankroll drops below threshold
-- Momentum-based bet adjustment (increase bets during hot streaks)
-- Session target tracking with smart exit signals
-- Risk-adjusted bet selection (match bet type to confidence level)
+- Sequence betting: [1,6,13,15,9] multipliers × $7.50 unit
+- On WIN: advance to next sequence step (wraps at end)
+- On LOSS: reset to step 0
+- Confidence gate: only bet when AI >= 65%
+- Stop-loss: $500 loss ($3,500 bankroll threshold)
+- No profit cap: let winners run
+- Marathon proven: 3.36M strategies, 1.57B sessions, P/R 0.152
 """
 
 import sys
@@ -20,9 +19,8 @@ from config import (
     KELLY_FRACTION, MAX_BET_MULTIPLIER, RECOVERY_BET_FACTOR,
     FORCED_WAIT_SPINS, CONFIDENCE_BET_THRESHOLD,
     CONFIDENCE_HIGH_THRESHOLD, WIN_PROBABILITIES, PAYOUTS,
-    BET_INCREMENT, BET_DECREMENT, MIN_BET,
-    LOSSES_BEFORE_INCREMENT, WINS_BEFORE_DECREMENT,
-    TOP_PREDICTIONS_COUNT
+    BET_SEQUENCE, MIN_BET, SESSION_TARGET_ENABLED,
+    TOP_PREDICTIONS_COUNT, WAIT_AFTER_LOSS_SPINS
 )
 
 
@@ -42,12 +40,14 @@ class BankrollManager:
         self.total_bets_placed = 0
         self.total_skips = 0
 
-        # Incremental betting strategy
-        self.current_bet_level = MIN_BET
-        self.loss_streak_for_increment = 0  # Separate counter: tracks losses for bet increment (survives forced waits)
+        # Sequence betting state (THE ONE strategy)
+        self.bet_sequence = list(BET_SEQUENCE)  # [1, 6, 13, 15, 9]
+        self.seq_idx = 0                         # Current position in sequence
+        self.unit_size = BASE_BET                # $7.50 per unit
 
         # State machine
         self.forced_wait_remaining = 0
+        self.loss_cooldown_remaining = 0   # Wait N spins after every loss
         self.in_recovery_mode = False
         self.in_protection_mode = False
 
@@ -78,6 +78,8 @@ class BankrollManager:
 
     @property
     def session_target_reached(self):
+        if not SESSION_TARGET_ENABLED:
+            return False  # No profit cap — let winners run
         return self.profit_loss >= self.session_target
 
     @property
@@ -128,8 +130,9 @@ class BankrollManager:
 
     def should_bet(self, ai_confidence, ai_mode):
         """Determine if we should place a bet considering all factors.
-        After consecutive losses, the AI requires higher confidence instead
-        of forcing arbitrary waits — the AI decides, not the user.
+
+        Strategy: After every loss, WAIT 2 spins before betting again.
+        User observed that WAIT periods correlate with better outcomes.
         """
         # Session target reached - stop
         if self.session_target_reached:
@@ -138,6 +141,10 @@ class BankrollManager:
         # Stop loss hit - stop
         if self.stop_loss_hit:
             return False, 'STOP_LOSS_HIT'
+
+        # Loss cooldown: wait N spins after each loss
+        if self.loss_cooldown_remaining > 0:
+            return False, f'LOSS_COOLDOWN ({self.loss_cooldown_remaining} spins remaining)'
 
         # Protection mode - only bet on very high confidence
         if self.in_protection_mode and ai_confidence < CONFIDENCE_HIGH_THRESHOLD:
@@ -160,28 +167,30 @@ class BankrollManager:
         return True, 'BET'
 
     def calculate_bet_amount(self, confidence=0, bet_type='straight', num_predictions=None):
-        """Calculate bet amount per number using incremental strategy.
+        """Calculate bet amount per number using sequence strategy (THE ONE).
 
-        Strategy: $1 base, +$1 after 3 consecutive losses, -$1 after 2 consecutive wins.
-        Returns the per-number bet amount.
+        Returns unit_size × sequence[seq_idx] as the per-number bet.
+        The sequence [1,6,13,15,9] applied to $7.50 unit gives:
+          Step 0: $7.50, Step 1: $45, Step 2: $97.50, Step 3: $112.50, Step 4: $67.50
 
         Args:
             num_predictions: actual number of predictions (dynamic). Falls back to TOP_PREDICTIONS_COUNT.
         """
         n_preds = num_predictions or TOP_PREDICTIONS_COUNT
         self._last_num_predictions = n_preds  # Store for process_result
-        per_number = self.current_bet_level
 
-        # Enforce limits
-        max_bet = MIN_BET * MAX_BET_MULTIPLIER
+        # Sequence-based bet: unit_size × current multiplier
+        multiplier = self.bet_sequence[self.seq_idx % len(self.bet_sequence)]
+        per_number = self.unit_size * multiplier
+
+        # Enforce max: BASE_BET × MAX_BET_MULTIPLIER ($7.50 × 15 = $112.50)
+        max_bet = BASE_BET * MAX_BET_MULTIPLIER
         per_number = min(per_number, max_bet)
 
-        # Total exposure check: don't risk more than 5% of bankroll
-        total_bet = per_number * n_preds
-        if total_bet > self.bankroll * 0.05:
-            per_number = max(MIN_BET, (self.bankroll * 0.05) / n_preds)
-
+        # Floor
         per_number = max(MIN_BET, per_number)
+
+        # Safety: can't bet more than bankroll allows
         per_number = min(per_number, self.bankroll / max(1, n_preds))
 
         return round(per_number, 2)
@@ -255,6 +264,14 @@ class BankrollManager:
             warnings.append(f'Bankroll is ${abs(amt_below):.0f} above stop-loss. Playing very cautiously.')
             tips.append(f'AI confidence needs to reach {CONFIDENCE_HIGH_THRESHOLD}% before we bet in protection mode.')
 
+        elif self.loss_cooldown_remaining > 0:
+            action = 'WAIT'
+            action_label = f'COOLDOWN ({self.loss_cooldown_remaining} spins)'
+            reason = f'Cooling down after loss. Wait {self.loss_cooldown_remaining} more spin{"s" if self.loss_cooldown_remaining > 1 else ""} before betting again.'
+            strategy = 'Loss Cooldown'
+            tips.append('Waiting after a loss helps avoid chasing losses.')
+            tips.append('Keep entering spins — the AI is still learning from each result.')
+
         elif ai_mode == 'WAIT' or ai_confidence < CONFIDENCE_BET_THRESHOLD:
             action = 'WAIT'
             action_label = 'WAIT'
@@ -272,16 +289,17 @@ class BankrollManager:
             primary_type = recommended_types[0]
             bet_amount = self.calculate_bet_amount(ai_confidence, primary_type)
 
+            multiplier = self.bet_sequence[self.seq_idx % len(self.bet_sequence)]
             if ai_confidence >= CONFIDENCE_HIGH_THRESHOLD:
                 action_label = 'BET (HIGH CONFIDENCE)'
-                reason = f'Strong signal detected! AI confidence {ai_confidence}% is above {CONFIDENCE_HIGH_THRESHOLD}%. Increased bet sizing active.'
-                strategy = 'Aggressive'
+                reason = f'AI confidence {ai_confidence}% meets {CONFIDENCE_BET_THRESHOLD}% gate. Sequence step {self.seq_idx + 1}/{len(self.bet_sequence)} (x{multiplier}).'
+                strategy = f'THE ONE - Step {self.seq_idx + 1}'
                 if self.hot_streak:
-                    tips.append('Hot streak detected! Riding the momentum with slightly larger bets.')
+                    tips.append('Hot streak detected! Sequence advancing — let it ride.')
             else:
                 action_label = 'BET'
-                reason = f'AI confidence {ai_confidence}% meets {CONFIDENCE_BET_THRESHOLD}% threshold. Standard bet sizing.'
-                strategy = 'Standard'
+                reason = f'AI confidence {ai_confidence}% meets {CONFIDENCE_BET_THRESHOLD}% gate. Sequence step {self.seq_idx + 1}/{len(self.bet_sequence)} (x{multiplier}).'
+                strategy = f'THE ONE - Step {self.seq_idx + 1}'
 
             if self.in_recovery_mode:
                 strategy = 'Recovery'
@@ -319,11 +337,12 @@ class BankrollManager:
         elif momentum < -50:
             tips.append('Negative momentum. The AI will wait for better opportunities.')
 
-        # Distance to target
-        remaining = self.session_target - self.profit_loss
-        if remaining > 0 and action == 'BET':
-            bets_to_target = remaining / self.base_bet if self.base_bet > 0 else 0
-            tips.append(f'${remaining:.2f} away from session target. ~{int(bets_to_target)} base bets remaining.')
+        # Distance to target (only when target is enabled)
+        if SESSION_TARGET_ENABLED:
+            remaining = self.session_target - self.profit_loss
+            if remaining > 0 and action == 'BET':
+                bets_to_target = remaining / self.base_bet if self.base_bet > 0 else 0
+                tips.append(f'${remaining:.2f} away from session target. ~{int(bets_to_target)} base bets remaining.')
 
         # Build primary bet amount
         primary_bet_amount = 0
@@ -352,20 +371,20 @@ class BankrollManager:
             'distance_to_stop_loss': round(self.bankroll - STOP_LOSS_THRESHOLD, 2),
             'kelly_fraction': KELLY_FRACTION,
             'base_bet': self.base_bet,
-            'max_bet': round(self.base_bet * MAX_BET_MULTIPLIER, 2),
+            'max_bet': round(self.base_bet * max(self.bet_sequence), 2),
             'bankroll_pct_at_risk': round(primary_bet_amount / self.bankroll * 100, 2) if self.bankroll > 0 and primary_bet_amount > 0 else 0
         }
 
     def process_result(self, bet_amount, won, payout_amount=0):
         """Process bet result and update state machine with incremental betting.
 
-        For straight bets on 12 numbers ($1 each = $12 total):
+        For straight bets on N numbers ($1 each = $N total):
         - WIN:  One number hits → payout $35 + $1 stake back = $36 return.
-                Net profit = $36 - $12 = +$24.
-        - LOSS: No number hits → lose $12.
+                Net profit = $36 - $N.
+        - LOSS: No number hits → lose $N.
 
         Args:
-            bet_amount: Total amount wagered across all numbers (e.g. $12)
+            bet_amount: Total amount wagered across all numbers (e.g. $14)
             won: Whether any predicted number hit
             payout_amount: Raw payout on winning number (e.g. 35 for 35:1)
         """
@@ -373,20 +392,18 @@ class BankrollManager:
 
         if won:
             # Net profit = winnings (35:1) + stake back - total cost of all bets
-            # e.g. $35 + $1 - $12 = $24 if betting $1 on each of 12 numbers
+            # e.g. $35 + $1 - $14 = $22 if betting $1 on each of 14 numbers
             per_number_stake = bet_amount / max(1, self._last_num_predictions) if hasattr(self, '_last_num_predictions') else bet_amount / max(1, TOP_PREDICTIONS_COUNT)
             net = payout_amount + per_number_stake - bet_amount
             self.bankroll += net
             self.total_wins += 1
             self.consecutive_losses = 0
             self.consecutive_wins += 1
-            self.loss_streak_for_increment = 0  # Reset loss streak on any win
             self.in_recovery_mode = False
+            self.loss_cooldown_remaining = 0   # Clear cooldown on win
 
-            # Incremental strategy: decrease bet after WINS_BEFORE_DECREMENT wins
-            if self.consecutive_wins >= WINS_BEFORE_DECREMENT:
-                self.current_bet_level = max(MIN_BET, self.current_bet_level - BET_DECREMENT)
-                self.consecutive_wins = 0
+            # Sequence strategy: advance on win, wrap at end
+            self.seq_idx = (self.seq_idx + 1) % len(self.bet_sequence)
 
             # Exit protection mode after 2 consecutive wins
             if self.in_protection_mode and self.total_wins >= 2:
@@ -398,14 +415,10 @@ class BankrollManager:
             self.total_losses += 1
             self.consecutive_losses += 1
             self.consecutive_wins = 0
-            self.loss_streak_for_increment += 1  # Separate counter: survives forced waits
             self.max_consecutive_losses = max(self.max_consecutive_losses, self.consecutive_losses)
 
-            # Incremental strategy: increase bet after 3 successive losses
-            # Uses loss_streak_for_increment which survives forced waits
-            if self.loss_streak_for_increment >= LOSSES_BEFORE_INCREMENT:
-                self.current_bet_level += BET_INCREMENT
-                self.loss_streak_for_increment = 0
+            # Sequence strategy: reset to step 0 on loss
+            self.seq_idx = 0
 
             # After MAX_CONSECUTIVE_LOSSES, enter recovery mode (higher confidence required)
             if self.consecutive_losses >= MAX_CONSECUTIVE_LOSSES:
@@ -414,6 +427,9 @@ class BankrollManager:
             # Enter protection mode
             if self.bankroll < STOP_LOSS_THRESHOLD:
                 self.in_protection_mode = True
+
+            # Activate loss cooldown: wait N spins before betting again
+            self.loss_cooldown_remaining = WAIT_AFTER_LOSS_SPINS
 
             net = -bet_amount
 
@@ -435,9 +451,12 @@ class BankrollManager:
         self.pnl_history.append(round(self.profit_loss, 2))
 
     def tick_wait(self):
-        """Call each spin when in forced wait to count down."""
+        """Call each spin when in forced wait to count down.
+        Also ticks down loss cooldown (wait-after-loss timer)."""
         if self.forced_wait_remaining > 0:
             self.forced_wait_remaining -= 1
+        if self.loss_cooldown_remaining > 0:
+            self.loss_cooldown_remaining -= 1
 
     def get_status(self):
         """Full bankroll status for the dashboard."""
@@ -446,7 +465,7 @@ class BankrollManager:
             'initial_bankroll': self.initial_bankroll,
             'profit_loss': self.profit_loss,
             'session_target': self.session_target,
-            'target_progress': round(min(100, max(0, self.profit_loss / self.session_target * 100)), 1),
+            'target_progress': round(min(100, max(0, self.profit_loss / self.session_target * 100)), 1) if SESSION_TARGET_ENABLED else 0,
             'win_rate': self.win_rate,
             'total_wins': self.total_wins,
             'total_losses': self.total_losses,
@@ -456,12 +475,16 @@ class BankrollManager:
             'consecutive_wins': self.consecutive_wins,
             'max_consecutive_losses': self.max_consecutive_losses,
             'forced_wait_remaining': self.forced_wait_remaining,
+            'loss_cooldown_remaining': self.loss_cooldown_remaining,
             'in_recovery_mode': self.in_recovery_mode,
             'in_protection_mode': self.in_protection_mode,
             'session_target_reached': self.session_target_reached,
             'stop_loss_hit': self.stop_loss_hit,
             'base_bet': self.base_bet,
-            'current_bet_level': self.current_bet_level,
+            'current_bet_level': round(self.unit_size * self.bet_sequence[self.seq_idx % len(self.bet_sequence)], 2),
+            'seq_position': self.seq_idx,
+            'seq_step_label': f"Step {self.seq_idx + 1}/{len(self.bet_sequence)}",
+            'seq_multiplier': self.bet_sequence[self.seq_idx % len(self.bet_sequence)],
             'risk_level': self.risk_level,
             'drawdown': self.drawdown,
             'peak_bankroll': round(self.peak_bankroll, 2),
@@ -535,31 +558,14 @@ class BankrollManager:
                 current_cl = 0
         self.max_consecutive_losses = max_cl
 
-        # Rebuild loss_streak_for_increment (count recent consecutive losses for bet sizing)
-        self.loss_streak_for_increment = 0
-        for entry in reversed(self.bet_history):
-            if not entry['won']:
-                self.loss_streak_for_increment += 1
-            else:
-                break
-
-        # Recalculate current_bet_level from scratch based on incremental rules
-        self.current_bet_level = MIN_BET
-        temp_loss_streak = 0
-        temp_win_streak = 0
+        # Rebuild sequence position from bet history
+        # Rule: on win advance (wrapping), on loss reset to 0
+        self.seq_idx = 0
         for entry in self.bet_history:
             if entry['won']:
-                temp_loss_streak = 0
-                temp_win_streak += 1
-                if temp_win_streak >= WINS_BEFORE_DECREMENT:
-                    self.current_bet_level = max(MIN_BET, self.current_bet_level - BET_DECREMENT)
-                    temp_win_streak = 0
+                self.seq_idx = (self.seq_idx + 1) % len(self.bet_sequence)
             else:
-                temp_win_streak = 0
-                temp_loss_streak += 1
-                if temp_loss_streak >= LOSSES_BEFORE_INCREMENT:
-                    self.current_bet_level += BET_INCREMENT
-                    temp_loss_streak = 0
+                self.seq_idx = 0
 
         # Rebuild momentum (recent_results)
         self.recent_results = []
@@ -584,6 +590,12 @@ class BankrollManager:
         # Recalculate mode flags
         self.in_protection_mode = self.bankroll < STOP_LOSS_THRESHOLD
         self.in_recovery_mode = self.consecutive_losses >= MAX_CONSECUTIVE_LOSSES
+
+        # Recalculate loss cooldown: if last bet was a loss, set cooldown
+        if self.bet_history and not self.bet_history[-1]['won']:
+            self.loss_cooldown_remaining = WAIT_AFTER_LOSS_SPINS
+        else:
+            self.loss_cooldown_remaining = 0
 
         return last_bet
 

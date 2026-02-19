@@ -1,0 +1,508 @@
+========================================
+HOURLY MONITORING STARTED: Fri Feb 13 23:10:34 GMT 2026
+========================================
+
+════════════════════════════════════════════════════════════════
+HOUR 1 UPDATE — Sat Feb 14 00:10:34 GMT 2026
+════════════════════════════════════════════════════════════════
+  Process: RUNNING at 98.8
+0.0% CPU
+  Output lines:      243
+  Phases reached:
+    PHASE 1: 2-MODEL PAIRS (5% coarse + 1% finetune)
+    PHASE 2: 3-MODEL COMBOS (top 10 models, 10% steps)
+  Errors: 0
+0
+  --- Latest Leaderboard Top 5 ---
+  AFTER PHASE 1 (min 100 bets)
+  ==============================================================================================================
+    # Config                                                                  Bets   Hit%    Edge   Profit  Bet%
+  ---------------------------------------------------------------------------------------------------------
+    1 markov(30%)+pattern3(70%)                                               3195  34.59   +2.15 $  +2880  100%
+    2 markov(30%)+pattern3(70%)                                               3195  34.59   +2.15 $  +2880  100%
+    3 markov(29%)+pattern3(71%)                                               3195  34.52   +2.09 $  +2736  100%
+    4 markov(31%)+pattern3(69%)                                               3195  34.52   +2.09 $  +2736  100%
+    5 markov(34%)+pattern3(66%)                                               3195  34.46   +2.03 $  +2592  100%
+  --- Last 5 lines of output ---
+========================================================================================================================
+PHASE 2: 3-MODEL COMBOS (top 10 models, 10% steps)
+Time: 60min elapsed, 660min remaining | Budget: 90min | Tested: 6048
+========================================================================================================================
+  Top 10 models for 3-model combos: ['table', 'pattern3', 'odd_even', 'set', 'markov', 'high_low', 'tab_contra', 'sector', 'gap']
+
+════════════════════════════════════════════════════════════════
+HOUR 2 UPDATE — Sat Feb 14 01:10:34 GMT 2026
+════════════════════════════════════════════════════════════════
+  Process: RUNNING at 93.2
+0.0% CPU
+  Output lines:      426
+  Phases reached:
+    PHASE 1: 2-MODEL PAIRS (5% coarse + 1% finetune)
+    PHASE 2: 3-MODEL COMBOS (top 10 models, 10% steps)
+    PHASE 3: TOP-N SWEEP (8-16) with top 40 weight combos
+    PHASE 4: TRIGGER STRATEGIES with top weights
+    PHASE 5: SIGNAL GATE SWEEP
+    PHASE 6: GATE + TRIGGER HYBRIDS
+    PHASE 7: STREAK-BASED FILTERS
+    PHASE 8: 4-MODEL COMBOS (top 8 models, 10% steps)
+  Errors: 0
+0
+  --- Latest Leaderboard Top 5 ---
+    1 N=14 pattern3(55%)+markov(45%)|tab>=35                                    49  51.02  +13.18 $   +428    2% *
+    2 N=14 pattern3(66%)+markov(34%)|tab>=35                                    49  51.02  +13.18 $   +428    2% *
+    3 N=14 pattern3(67%)+markov(33%)|tab>=35                                    49  48.98  +11.14 $   +356    2% *
+    4 N=13 set(50%)+sector(45%)+odd_even(5%)|alternating|pol>=25                94  48.94  +13.80 $   +868    3% *
+    5 N=14 set(50%)+sector(45%)+odd_even(5%)|alternating|pol>=25                94  48.94  +11.10 $   +680    3% *
+--
+  AFTER PHASE 7 (min 20 bets)
+  ==============================================================================================================
+    # Config                                                                  Bets   Hit%    Edge   Profit  Bet%
+  ---------------------------------------------------------------------------------------------------------
+    1 N=14 pattern3(55%)+markov(45%)|tab>=35                                    49  51.02  +13.18 $   +428    2% *
+    2 N=14 pattern3(66%)+markov(34%)|tab>=35                                    49  51.02  +13.18 $   +428    2% *
+    3 N=14 pattern3(67%)+markov(33%)|tab>=35                                    49  48.98  +11.14 $   +356    2% *
+    4 N=13 set(50%)+sector(45%)+odd_even(5%)|alternating|pol>=25                94  48.94  +13.80 $   +868    3% *
+    5 N=14 set(50%)+sector(45%)+odd_even(5%)|alternating|pol>=25                94  48.94  +11.10 $   +680    3% *
+  --- Last 5 lines of output ---
+========================================================================================================================
+PHASE 8: 4-MODEL COMBOS (top 8 models, 10% steps)
+Time: 127min elapsed, 593min remaining | Budget: 60min | Tested: 21813
+========================================================================================================================
+  Using top 8 models: ['table', 'pattern3', 'odd_even', 'set', 'markov', 'high_low', 'tab_contra', 'sector']
+
+════════════════════════════════════════════════════════════════
+HOUR 3 UPDATE — Sat Feb 14 02:10:34 GMT 2026
+════════════════════════════════════════════════════════════════
+  Process: RUNNING at 99.8
+0.0% CPU
+  Output lines:      596
+  Phases reached:
+    PHASE 1: 2-MODEL PAIRS (5% coarse + 1% finetune)
+    PHASE 2: 3-MODEL COMBOS (top 10 models, 10% steps)
+    PHASE 3: TOP-N SWEEP (8-16) with top 40 weight combos
+    PHASE 4: TRIGGER STRATEGIES with top weights
+    PHASE 5: SIGNAL GATE SWEEP
+    PHASE 6: GATE + TRIGGER HYBRIDS
+    PHASE 7: STREAK-BASED FILTERS
+    PHASE 8: 4-MODEL COMBOS (top 8 models, 10% steps)
+    PHASE 9: WINDOW SWEEP — different warmup/history sizes
+    PHASE 10: MEGA COMBOS — combine top configs with gates + triggers + N + streaks
+    PHASE 11: RANDOM PERTURBATIONS of top configs
+  Errors: 0
+0
+  --- Latest Leaderboard Top 5 ---
+    1 N=14 set(65%)+sector(30%)+odd_even(5%)|tab>=25                           234  47.86  +10.03 $  +1512    7% *
+    2 N=14 set(60%)+sector(30%)+odd_even(10%)|tab>=25                          234  47.86  +10.03 $  +1512    7% *
+    3 N=14 set(60%)+sector(30%)+odd_even(10%)|tab>=25                          234  47.86  +10.03 $  +1512    7% *
+    4 N=14 set(50%)+sector(45%)+odd_even(5%)|tab>=25                           234  47.86  +10.03 $  +1512    7% *
+    5 N=14 set(55%)+sector(40%)+odd_even(5%)|tab>=25                           234  47.86  +10.03 $  +1512    7% *
+--
+  AFTER PHASE 10 — MEGA COMBOS (min 20 bets)
+  ==============================================================================================================
+    # Config                                                                  Bets   Hit%    Edge   Profit  Bet%
+  ---------------------------------------------------------------------------------------------------------
+    1 N=14 pattern3(55%)+markov(45%)|tab>=35                                    49  51.02  +13.18 $   +428    2% *
+    2 N=14 pattern3(66%)+markov(34%)|tab>=35                                    49  51.02  +13.18 $   +428    2% *
+    3 N=14 pattern3(67%)+markov(33%)|tab>=35                                    49  48.98  +11.14 $   +356    2% *
+    4 N=13 set(50%)+sector(45%)+odd_even(5%)|alternating|pol>=25                94  48.94  +13.80 $   +868    3% *
+    5 N=14 set(50%)+sector(45%)+odd_even(5%)|alternating|pol>=25                94  48.94  +11.10 $   +680    3% *
+  --- Last 5 lines of output ---
+PHASE 11: RANDOM PERTURBATIONS of top configs
+Time: 186min elapsed, 534min remaining | Budget: 504min | Tested: 38108
+========================================================================================================================
+  ... 1000 perturbations, 195min
+  ... 2000 perturbations, 204min
+
+════════════════════════════════════════════════════════════════
+HOUR 4 UPDATE — Sat Feb 14 03:10:34 GMT 2026
+════════════════════════════════════════════════════════════════
+  Process: RUNNING at 100.0
+0.0% CPU
+  Output lines:      602
+  Phases reached:
+    PHASE 1: 2-MODEL PAIRS (5% coarse + 1% finetune)
+    PHASE 2: 3-MODEL COMBOS (top 10 models, 10% steps)
+    PHASE 3: TOP-N SWEEP (8-16) with top 40 weight combos
+    PHASE 4: TRIGGER STRATEGIES with top weights
+    PHASE 5: SIGNAL GATE SWEEP
+    PHASE 6: GATE + TRIGGER HYBRIDS
+    PHASE 7: STREAK-BASED FILTERS
+    PHASE 8: 4-MODEL COMBOS (top 8 models, 10% steps)
+    PHASE 9: WINDOW SWEEP — different warmup/history sizes
+    PHASE 10: MEGA COMBOS — combine top configs with gates + triggers + N + streaks
+    PHASE 11: RANDOM PERTURBATIONS of top configs
+  Errors: 0
+0
+  --- Latest Leaderboard Top 5 ---
+    1 N=14 set(65%)+sector(30%)+odd_even(5%)|tab>=25                           234  47.86  +10.03 $  +1512    7% *
+    2 N=14 set(60%)+sector(30%)+odd_even(10%)|tab>=25                          234  47.86  +10.03 $  +1512    7% *
+    3 N=14 set(60%)+sector(30%)+odd_even(10%)|tab>=25                          234  47.86  +10.03 $  +1512    7% *
+    4 N=14 set(50%)+sector(45%)+odd_even(5%)|tab>=25                           234  47.86  +10.03 $  +1512    7% *
+    5 N=14 set(55%)+sector(40%)+odd_even(5%)|tab>=25                           234  47.86  +10.03 $  +1512    7% *
+--
+  AFTER PHASE 10 — MEGA COMBOS (min 20 bets)
+  ==============================================================================================================
+    # Config                                                                  Bets   Hit%    Edge   Profit  Bet%
+  ---------------------------------------------------------------------------------------------------------
+    1 N=14 pattern3(55%)+markov(45%)|tab>=35                                    49  51.02  +13.18 $   +428    2% *
+    2 N=14 pattern3(66%)+markov(34%)|tab>=35                                    49  51.02  +13.18 $   +428    2% *
+    3 N=14 pattern3(67%)+markov(33%)|tab>=35                                    49  48.98  +11.14 $   +356    2% *
+    4 N=13 set(50%)+sector(45%)+odd_even(5%)|alternating|pol>=25                94  48.94  +13.80 $   +868    3% *
+    5 N=14 set(50%)+sector(45%)+odd_even(5%)|alternating|pol>=25                94  48.94  +11.10 $   +680    3% *
+  --- Last 5 lines of output ---
+  ... 4000 perturbations, 222min
+  ... 5000 perturbations, 232min
+  ... 6000 perturbations, 241min
+  ... 7000 perturbations, 251min
+  ... 8000 perturbations, 260min
+
+════════════════════════════════════════════════════════════════
+HOUR 5 UPDATE — Sat Feb 14 04:10:35 GMT 2026
+════════════════════════════════════════════════════════════════
+  Process: RUNNING at 99.1
+0.0% CPU
+  Output lines:      608
+  Phases reached:
+    PHASE 1: 2-MODEL PAIRS (5% coarse + 1% finetune)
+    PHASE 2: 3-MODEL COMBOS (top 10 models, 10% steps)
+    PHASE 3: TOP-N SWEEP (8-16) with top 40 weight combos
+    PHASE 4: TRIGGER STRATEGIES with top weights
+    PHASE 5: SIGNAL GATE SWEEP
+    PHASE 6: GATE + TRIGGER HYBRIDS
+    PHASE 7: STREAK-BASED FILTERS
+    PHASE 8: 4-MODEL COMBOS (top 8 models, 10% steps)
+    PHASE 9: WINDOW SWEEP — different warmup/history sizes
+    PHASE 10: MEGA COMBOS — combine top configs with gates + triggers + N + streaks
+    PHASE 11: RANDOM PERTURBATIONS of top configs
+  Errors: 0
+0
+  --- Latest Leaderboard Top 5 ---
+    1 N=14 set(65%)+sector(30%)+odd_even(5%)|tab>=25                           234  47.86  +10.03 $  +1512    7% *
+    2 N=14 set(60%)+sector(30%)+odd_even(10%)|tab>=25                          234  47.86  +10.03 $  +1512    7% *
+    3 N=14 set(60%)+sector(30%)+odd_even(10%)|tab>=25                          234  47.86  +10.03 $  +1512    7% *
+    4 N=14 set(50%)+sector(45%)+odd_even(5%)|tab>=25                           234  47.86  +10.03 $  +1512    7% *
+    5 N=14 set(55%)+sector(40%)+odd_even(5%)|tab>=25                           234  47.86  +10.03 $  +1512    7% *
+--
+  AFTER PHASE 10 — MEGA COMBOS (min 20 bets)
+  ==============================================================================================================
+    # Config                                                                  Bets   Hit%    Edge   Profit  Bet%
+  ---------------------------------------------------------------------------------------------------------
+    1 N=14 pattern3(55%)+markov(45%)|tab>=35                                    49  51.02  +13.18 $   +428    2% *
+    2 N=14 pattern3(66%)+markov(34%)|tab>=35                                    49  51.02  +13.18 $   +428    2% *
+    3 N=14 pattern3(67%)+markov(33%)|tab>=35                                    49  48.98  +11.14 $   +356    2% *
+    4 N=13 set(50%)+sector(45%)+odd_even(5%)|alternating|pol>=25                94  48.94  +13.80 $   +868    3% *
+    5 N=14 set(50%)+sector(45%)+odd_even(5%)|alternating|pol>=25                94  48.94  +11.10 $   +680    3% *
+  --- Last 5 lines of output ---
+  ... 10000 perturbations, 279min
+  ... 11000 perturbations, 288min
+  ... 12000 perturbations, 298min
+  ... 13000 perturbations, 308min
+  ... 14000 perturbations, 317min
+
+════════════════════════════════════════════════════════════════
+HOUR 6 UPDATE — Sat Feb 14 05:10:35 GMT 2026
+════════════════════════════════════════════════════════════════
+  Process: RUNNING at 99.3
+0.0% CPU
+  Output lines:      616
+  Phases reached:
+    PHASE 1: 2-MODEL PAIRS (5% coarse + 1% finetune)
+    PHASE 2: 3-MODEL COMBOS (top 10 models, 10% steps)
+    PHASE 3: TOP-N SWEEP (8-16) with top 40 weight combos
+    PHASE 4: TRIGGER STRATEGIES with top weights
+    PHASE 5: SIGNAL GATE SWEEP
+    PHASE 6: GATE + TRIGGER HYBRIDS
+    PHASE 7: STREAK-BASED FILTERS
+    PHASE 8: 4-MODEL COMBOS (top 8 models, 10% steps)
+    PHASE 9: WINDOW SWEEP — different warmup/history sizes
+    PHASE 10: MEGA COMBOS — combine top configs with gates + triggers + N + streaks
+    PHASE 11: RANDOM PERTURBATIONS of top configs
+  Errors: 0
+0
+  --- Latest Leaderboard Top 5 ---
+    1 N=14 set(65%)+sector(30%)+odd_even(5%)|tab>=25                           234  47.86  +10.03 $  +1512    7% *
+    2 N=14 set(60%)+sector(30%)+odd_even(10%)|tab>=25                          234  47.86  +10.03 $  +1512    7% *
+    3 N=14 set(60%)+sector(30%)+odd_even(10%)|tab>=25                          234  47.86  +10.03 $  +1512    7% *
+    4 N=14 set(50%)+sector(45%)+odd_even(5%)|tab>=25                           234  47.86  +10.03 $  +1512    7% *
+    5 N=14 set(55%)+sector(40%)+odd_even(5%)|tab>=25                           234  47.86  +10.03 $  +1512    7% *
+--
+  AFTER PHASE 10 — MEGA COMBOS (min 20 bets)
+  ==============================================================================================================
+    # Config                                                                  Bets   Hit%    Edge   Profit  Bet%
+  ---------------------------------------------------------------------------------------------------------
+    1 N=14 pattern3(55%)+markov(45%)|tab>=35                                    49  51.02  +13.18 $   +428    2% *
+    2 N=14 pattern3(66%)+markov(34%)|tab>=35                                    49  51.02  +13.18 $   +428    2% *
+    3 N=14 pattern3(67%)+markov(33%)|tab>=35                                    49  48.98  +11.14 $   +356    2% *
+    4 N=13 set(50%)+sector(45%)+odd_even(5%)|alternating|pol>=25                94  48.94  +13.80 $   +868    3% *
+    5 N=14 set(50%)+sector(45%)+odd_even(5%)|alternating|pol>=25                94  48.94  +11.10 $   +680    3% *
+  --- Last 5 lines of output ---
+  ... 18000 perturbations, 349min
+  ... 19000 perturbations, 357min
+  ... 20000 perturbations, 365min
+  ... 21000 perturbations, 372min
+  ... 22000 perturbations, 380min
+
+════════════════════════════════════════════════════════════════
+HOUR 7 UPDATE — Sat Feb 14 06:10:35 GMT 2026
+════════════════════════════════════════════════════════════════
+  Process: RUNNING at 100.0
+0.0% CPU
+  Output lines:      626
+  Phases reached:
+    PHASE 1: 2-MODEL PAIRS (5% coarse + 1% finetune)
+    PHASE 2: 3-MODEL COMBOS (top 10 models, 10% steps)
+    PHASE 3: TOP-N SWEEP (8-16) with top 40 weight combos
+    PHASE 4: TRIGGER STRATEGIES with top weights
+    PHASE 5: SIGNAL GATE SWEEP
+    PHASE 6: GATE + TRIGGER HYBRIDS
+    PHASE 7: STREAK-BASED FILTERS
+    PHASE 8: 4-MODEL COMBOS (top 8 models, 10% steps)
+    PHASE 9: WINDOW SWEEP — different warmup/history sizes
+    PHASE 10: MEGA COMBOS — combine top configs with gates + triggers + N + streaks
+    PHASE 11: RANDOM PERTURBATIONS of top configs
+  Errors: 0
+0
+  --- Latest Leaderboard Top 5 ---
+    1 N=14 set(65%)+sector(30%)+odd_even(5%)|tab>=25                           234  47.86  +10.03 $  +1512    7% *
+    2 N=14 set(60%)+sector(30%)+odd_even(10%)|tab>=25                          234  47.86  +10.03 $  +1512    7% *
+    3 N=14 set(60%)+sector(30%)+odd_even(10%)|tab>=25                          234  47.86  +10.03 $  +1512    7% *
+    4 N=14 set(50%)+sector(45%)+odd_even(5%)|tab>=25                           234  47.86  +10.03 $  +1512    7% *
+    5 N=14 set(55%)+sector(40%)+odd_even(5%)|tab>=25                           234  47.86  +10.03 $  +1512    7% *
+--
+  AFTER PHASE 10 — MEGA COMBOS (min 20 bets)
+  ==============================================================================================================
+    # Config                                                                  Bets   Hit%    Edge   Profit  Bet%
+  ---------------------------------------------------------------------------------------------------------
+    1 N=14 pattern3(55%)+markov(45%)|tab>=35                                    49  51.02  +13.18 $   +428    2% *
+    2 N=14 pattern3(66%)+markov(34%)|tab>=35                                    49  51.02  +13.18 $   +428    2% *
+    3 N=14 pattern3(67%)+markov(33%)|tab>=35                                    49  48.98  +11.14 $   +356    2% *
+    4 N=13 set(50%)+sector(45%)+odd_even(5%)|alternating|pol>=25                94  48.94  +13.80 $   +868    3% *
+    5 N=14 set(50%)+sector(45%)+odd_even(5%)|alternating|pol>=25                94  48.94  +11.10 $   +680    3% *
+  --- Last 5 lines of output ---
+  ... 28000 perturbations, 421min
+  ... 29000 perturbations, 428min
+  ... 30000 perturbations, 434min
+  ... 31000 perturbations, 439min
+  ... 32000 perturbations, 444min
+
+════════════════════════════════════════════════════════════════
+HOUR 8 UPDATE — Sat Feb 14 07:10:35 GMT 2026
+════════════════════════════════════════════════════════════════
+  Process: RUNNING at 97.6
+0.0% CPU
+  Output lines:      638
+  Phases reached:
+    PHASE 1: 2-MODEL PAIRS (5% coarse + 1% finetune)
+    PHASE 2: 3-MODEL COMBOS (top 10 models, 10% steps)
+    PHASE 3: TOP-N SWEEP (8-16) with top 40 weight combos
+    PHASE 4: TRIGGER STRATEGIES with top weights
+    PHASE 5: SIGNAL GATE SWEEP
+    PHASE 6: GATE + TRIGGER HYBRIDS
+    PHASE 7: STREAK-BASED FILTERS
+    PHASE 8: 4-MODEL COMBOS (top 8 models, 10% steps)
+    PHASE 9: WINDOW SWEEP — different warmup/history sizes
+    PHASE 10: MEGA COMBOS — combine top configs with gates + triggers + N + streaks
+    PHASE 11: RANDOM PERTURBATIONS of top configs
+  Errors: 0
+0
+  --- Latest Leaderboard Top 5 ---
+    1 N=14 set(65%)+sector(30%)+odd_even(5%)|tab>=25                           234  47.86  +10.03 $  +1512    7% *
+    2 N=14 set(60%)+sector(30%)+odd_even(10%)|tab>=25                          234  47.86  +10.03 $  +1512    7% *
+    3 N=14 set(60%)+sector(30%)+odd_even(10%)|tab>=25                          234  47.86  +10.03 $  +1512    7% *
+    4 N=14 set(50%)+sector(45%)+odd_even(5%)|tab>=25                           234  47.86  +10.03 $  +1512    7% *
+    5 N=14 set(55%)+sector(40%)+odd_even(5%)|tab>=25                           234  47.86  +10.03 $  +1512    7% *
+--
+  AFTER PHASE 10 — MEGA COMBOS (min 20 bets)
+  ==============================================================================================================
+    # Config                                                                  Bets   Hit%    Edge   Profit  Bet%
+  ---------------------------------------------------------------------------------------------------------
+    1 N=14 pattern3(55%)+markov(45%)|tab>=35                                    49  51.02  +13.18 $   +428    2% *
+    2 N=14 pattern3(66%)+markov(34%)|tab>=35                                    49  51.02  +13.18 $   +428    2% *
+    3 N=14 pattern3(67%)+markov(33%)|tab>=35                                    49  48.98  +11.14 $   +356    2% *
+    4 N=13 set(50%)+sector(45%)+odd_even(5%)|alternating|pol>=25                94  48.94  +13.80 $   +868    3% *
+    5 N=14 set(50%)+sector(45%)+odd_even(5%)|alternating|pol>=25                94  48.94  +11.10 $   +680    3% *
+  --- Last 5 lines of output ---
+  ... 40000 perturbations, 482min
+  ... 41000 perturbations, 487min
+  ... 42000 perturbations, 492min
+  ... 43000 perturbations, 497min
+  ... 44000 perturbations, 501min
+
+════════════════════════════════════════════════════════════════
+HOUR 9 UPDATE — Sat Feb 14 08:10:36 GMT 2026
+════════════════════════════════════════════════════════════════
+  Process: RUNNING at 87.3
+0.0% CPU
+  Output lines:      650
+  Phases reached:
+    PHASE 1: 2-MODEL PAIRS (5% coarse + 1% finetune)
+    PHASE 2: 3-MODEL COMBOS (top 10 models, 10% steps)
+    PHASE 3: TOP-N SWEEP (8-16) with top 40 weight combos
+    PHASE 4: TRIGGER STRATEGIES with top weights
+    PHASE 5: SIGNAL GATE SWEEP
+    PHASE 6: GATE + TRIGGER HYBRIDS
+    PHASE 7: STREAK-BASED FILTERS
+    PHASE 8: 4-MODEL COMBOS (top 8 models, 10% steps)
+    PHASE 9: WINDOW SWEEP — different warmup/history sizes
+    PHASE 10: MEGA COMBOS — combine top configs with gates + triggers + N + streaks
+    PHASE 11: RANDOM PERTURBATIONS of top configs
+  Errors: 0
+0
+  --- Latest Leaderboard Top 5 ---
+    1 N=14 set(65%)+sector(30%)+odd_even(5%)|tab>=25                           234  47.86  +10.03 $  +1512    7% *
+    2 N=14 set(60%)+sector(30%)+odd_even(10%)|tab>=25                          234  47.86  +10.03 $  +1512    7% *
+    3 N=14 set(60%)+sector(30%)+odd_even(10%)|tab>=25                          234  47.86  +10.03 $  +1512    7% *
+    4 N=14 set(50%)+sector(45%)+odd_even(5%)|tab>=25                           234  47.86  +10.03 $  +1512    7% *
+    5 N=14 set(55%)+sector(40%)+odd_even(5%)|tab>=25                           234  47.86  +10.03 $  +1512    7% *
+--
+  AFTER PHASE 10 — MEGA COMBOS (min 20 bets)
+  ==============================================================================================================
+    # Config                                                                  Bets   Hit%    Edge   Profit  Bet%
+  ---------------------------------------------------------------------------------------------------------
+    1 N=14 pattern3(55%)+markov(45%)|tab>=35                                    49  51.02  +13.18 $   +428    2% *
+    2 N=14 pattern3(66%)+markov(34%)|tab>=35                                    49  51.02  +13.18 $   +428    2% *
+    3 N=14 pattern3(67%)+markov(33%)|tab>=35                                    49  48.98  +11.14 $   +356    2% *
+    4 N=13 set(50%)+sector(45%)+odd_even(5%)|alternating|pol>=25                94  48.94  +13.80 $   +868    3% *
+    5 N=14 set(50%)+sector(45%)+odd_even(5%)|alternating|pol>=25                94  48.94  +11.10 $   +680    3% *
+  --- Last 5 lines of output ---
+  ... 52000 perturbations, 542min
+  ... 53000 perturbations, 547min
+  ... 54000 perturbations, 552min
+  ... 55000 perturbations, 557min
+  ... 56000 perturbations, 562min
+
+════════════════════════════════════════════════════════════════
+HOUR 10 UPDATE — Sat Feb 14 09:10:36 GMT 2026
+════════════════════════════════════════════════════════════════
+  Process: RUNNING at 99.5
+0.0% CPU
+  Output lines:      662
+  Phases reached:
+    PHASE 1: 2-MODEL PAIRS (5% coarse + 1% finetune)
+    PHASE 2: 3-MODEL COMBOS (top 10 models, 10% steps)
+    PHASE 3: TOP-N SWEEP (8-16) with top 40 weight combos
+    PHASE 4: TRIGGER STRATEGIES with top weights
+    PHASE 5: SIGNAL GATE SWEEP
+    PHASE 6: GATE + TRIGGER HYBRIDS
+    PHASE 7: STREAK-BASED FILTERS
+    PHASE 8: 4-MODEL COMBOS (top 8 models, 10% steps)
+    PHASE 9: WINDOW SWEEP — different warmup/history sizes
+    PHASE 10: MEGA COMBOS — combine top configs with gates + triggers + N + streaks
+    PHASE 11: RANDOM PERTURBATIONS of top configs
+  Errors: 0
+0
+  --- Latest Leaderboard Top 5 ---
+    1 N=14 set(65%)+sector(30%)+odd_even(5%)|tab>=25                           234  47.86  +10.03 $  +1512    7% *
+    2 N=14 set(60%)+sector(30%)+odd_even(10%)|tab>=25                          234  47.86  +10.03 $  +1512    7% *
+    3 N=14 set(60%)+sector(30%)+odd_even(10%)|tab>=25                          234  47.86  +10.03 $  +1512    7% *
+    4 N=14 set(50%)+sector(45%)+odd_even(5%)|tab>=25                           234  47.86  +10.03 $  +1512    7% *
+    5 N=14 set(55%)+sector(40%)+odd_even(5%)|tab>=25                           234  47.86  +10.03 $  +1512    7% *
+--
+  AFTER PHASE 10 — MEGA COMBOS (min 20 bets)
+  ==============================================================================================================
+    # Config                                                                  Bets   Hit%    Edge   Profit  Bet%
+  ---------------------------------------------------------------------------------------------------------
+    1 N=14 pattern3(55%)+markov(45%)|tab>=35                                    49  51.02  +13.18 $   +428    2% *
+    2 N=14 pattern3(66%)+markov(34%)|tab>=35                                    49  51.02  +13.18 $   +428    2% *
+    3 N=14 pattern3(67%)+markov(33%)|tab>=35                                    49  48.98  +11.14 $   +356    2% *
+    4 N=13 set(50%)+sector(45%)+odd_even(5%)|alternating|pol>=25                94  48.94  +13.80 $   +868    3% *
+    5 N=14 set(50%)+sector(45%)+odd_even(5%)|alternating|pol>=25                94  48.94  +11.10 $   +680    3% *
+  --- Last 5 lines of output ---
+  ... 64000 perturbations, 601min
+  ... 65000 perturbations, 606min
+  ... 66000 perturbations, 611min
+  ... 67000 perturbations, 617min
+  ... 68000 perturbations, 621min
+
+════════════════════════════════════════════════════════════════
+HOUR 11 UPDATE — Sat Feb 14 10:10:36 GMT 2026
+════════════════════════════════════════════════════════════════
+  Process: RUNNING at 98.5
+0.0% CPU
+  Output lines:      674
+  Phases reached:
+    PHASE 1: 2-MODEL PAIRS (5% coarse + 1% finetune)
+    PHASE 2: 3-MODEL COMBOS (top 10 models, 10% steps)
+    PHASE 3: TOP-N SWEEP (8-16) with top 40 weight combos
+    PHASE 4: TRIGGER STRATEGIES with top weights
+    PHASE 5: SIGNAL GATE SWEEP
+    PHASE 6: GATE + TRIGGER HYBRIDS
+    PHASE 7: STREAK-BASED FILTERS
+    PHASE 8: 4-MODEL COMBOS (top 8 models, 10% steps)
+    PHASE 9: WINDOW SWEEP — different warmup/history sizes
+    PHASE 10: MEGA COMBOS — combine top configs with gates + triggers + N + streaks
+    PHASE 11: RANDOM PERTURBATIONS of top configs
+  Errors: 0
+0
+  --- Latest Leaderboard Top 5 ---
+    1 N=14 set(65%)+sector(30%)+odd_even(5%)|tab>=25                           234  47.86  +10.03 $  +1512    7% *
+    2 N=14 set(60%)+sector(30%)+odd_even(10%)|tab>=25                          234  47.86  +10.03 $  +1512    7% *
+    3 N=14 set(60%)+sector(30%)+odd_even(10%)|tab>=25                          234  47.86  +10.03 $  +1512    7% *
+    4 N=14 set(50%)+sector(45%)+odd_even(5%)|tab>=25                           234  47.86  +10.03 $  +1512    7% *
+    5 N=14 set(55%)+sector(40%)+odd_even(5%)|tab>=25                           234  47.86  +10.03 $  +1512    7% *
+--
+  AFTER PHASE 10 — MEGA COMBOS (min 20 bets)
+  ==============================================================================================================
+    # Config                                                                  Bets   Hit%    Edge   Profit  Bet%
+  ---------------------------------------------------------------------------------------------------------
+    1 N=14 pattern3(55%)+markov(45%)|tab>=35                                    49  51.02  +13.18 $   +428    2% *
+    2 N=14 pattern3(66%)+markov(34%)|tab>=35                                    49  51.02  +13.18 $   +428    2% *
+    3 N=14 pattern3(67%)+markov(33%)|tab>=35                                    49  48.98  +11.14 $   +356    2% *
+    4 N=13 set(50%)+sector(45%)+odd_even(5%)|alternating|pol>=25                94  48.94  +13.80 $   +868    3% *
+    5 N=14 set(50%)+sector(45%)+odd_even(5%)|alternating|pol>=25                94  48.94  +11.10 $   +680    3% *
+  --- Last 5 lines of output ---
+  ... 76000 perturbations, 664min
+  ... 77000 perturbations, 669min
+  ... 78000 perturbations, 675min
+  ... 79000 perturbations, 679min
+  ... 80000 perturbations, 684min
+
+════════════════════════════════════════════════════════════════
+HOUR 12 UPDATE — Sat Feb 14 11:10:37 GMT 2026
+════════════════════════════════════════════════════════════════
+  Process: STOPPED
+  Output lines:      926
+  Phases reached:
+    PHASE 1: 2-MODEL PAIRS (5% coarse + 1% finetune)
+    PHASE 2: 3-MODEL COMBOS (top 10 models, 10% steps)
+    PHASE 3: TOP-N SWEEP (8-16) with top 40 weight combos
+    PHASE 4: TRIGGER STRATEGIES with top weights
+    PHASE 5: SIGNAL GATE SWEEP
+    PHASE 6: GATE + TRIGGER HYBRIDS
+    PHASE 7: STREAK-BASED FILTERS
+    PHASE 8: 4-MODEL COMBOS (top 8 models, 10% steps)
+    PHASE 9: WINDOW SWEEP — different warmup/history sizes
+    PHASE 10: MEGA COMBOS — combine top configs with gates + triggers + N + streaks
+    PHASE 11: RANDOM PERTURBATIONS of top configs
+    PHASE 12: NEW DATA: 3781 spins (was 3275)
+  Errors: 0
+0
+  --- Latest Leaderboard Top 5 ---
+    1 N=14 pattern3(55%)+markov(45%)|tab>=35                                    49  51.02  +13.18 $   +428    2% *
+    2 N=14 pattern3(66%)+markov(34%)|tab>=35                                    49  51.02  +13.18 $   +428    2% *
+    3 N=14 pattern3(67%)+markov(33%)|tab>=35                                    49  48.98  +11.14 $   +356    2% *
+    4 N=13 set(50%)+sector(45%)+odd_even(5%)|alternating|pol>=25                94  48.94  +13.80 $   +868    3% *
+    5 N=14 set(50%)+sector(45%)+odd_even(5%)|alternating|pol>=25                94  48.94  +11.10 $   +680    3% *
+--
+  AFTER PHASE 11 (min 50 bets)
+  ==============================================================================================================
+    # Config                                                                  Bets   Hit%    Edge   Profit  Bet%
+  ---------------------------------------------------------------------------------------------------------
+    1 N=14 PERT set(66%)+sector(33%)                                            94  51.06  +13.23 $   +824    3% *
+    2 N=14 PERT set(56%)+sector(43%)                                            94  51.06  +13.23 $   +824    3% *
+    3 N=14 PERT set(59%)+sector(40%)                                            94  51.06  +13.23 $   +824    3% *
+    4 N=14 PERT set(53%)+sector(46%)                                            94  51.06  +13.23 $   +824    3% *
+    5 N=14 PERT set(37%)+sector(29%)+red_black(24%)+odd_even(9%)               234  50.43  +12.59 $  +1944    7% *
+  --- Last 5 lines of output ---
+
+========================================================================================================================
+Marathon V2 finished. Total tested: 300 strategies in leaderboard.
+========================================================================================================================
+
+
+  *** MARATHON FINISHED OR CRASHED ***
+  Check scripts/marathon_v2_output.txt for full results
+
+════════════════════════════════════════════════════════════════
+MONITORING COMPLETE — Sat Feb 14 11:10:37 GMT 2026
+════════════════════════════════════════════════════════════════

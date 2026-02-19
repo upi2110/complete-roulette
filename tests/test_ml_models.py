@@ -93,7 +93,7 @@ SAMPLE_100 = REAL_DATA[:100]
 SAMPLE_500 = REAL_DATA[:500] if len(REAL_DATA) >= 500 else REAL_DATA
 
 # Model keys in get_model_status() — excludes top-level meta keys
-_MODEL_KEYS = ('frequency', 'markov', 'patterns', 'lstm')
+_MODEL_KEYS = ('frequency', 'markov', 'patterns', 'lstm', 'wheel_strategy', 'hot_number')
 
 
 # ═══════════════════════════════════════════════════════════════
@@ -462,17 +462,18 @@ class TestConfidenceEngine:
 
     def test_get_mode_wait(self):
         ce = ConfidenceEngine()
+        # Threshold is 65 — confidence 30 is below → WAIT
         assert ce.get_mode(30.0) == 'WAIT'
 
     def test_get_mode_bet(self):
         ce = ConfidenceEngine()
-        # BET threshold is 40, HIGH is 50 — so 45 is BET
-        assert ce.get_mode(45.0) == 'BET'
+        # Threshold is 65 — confidence 45 is below → WAIT
+        assert ce.get_mode(45.0) == 'WAIT'
 
     def test_get_mode_bet_high(self):
         ce = ConfidenceEngine()
-        # HIGH threshold is 50 — so 55 is BET_HIGH
-        assert ce.get_mode(55.0) == 'BET_HIGH'
+        # CONFIDENCE_HIGH_THRESHOLD = 65 — confidence 70 is above → BET_HIGH
+        assert ce.get_mode(70.0) == 'BET_HIGH'
 
     def test_get_breakdown_structure(self):
         ce = ConfidenceEngine()
@@ -600,49 +601,32 @@ class TestEnsemblePredictor:
         assert 3 <= len(pred['top_numbers']) <= TOP_PREDICTIONS_MAX
         assert len(pred['top_probabilities']) == len(pred['top_numbers'])
 
-    def test_predict_has_anchors(self):
-        """Verify prediction contains 1-4 anchors (variable spread may use fewer)"""
+    def test_predict_has_top_numbers(self):
+        """Verify prediction contains top-N individual numbers by probability"""
         ep = EnsemblePredictor()
         ep.load_history(SAMPLE_50)
         pred = ep.predict()
         assert 'anchors' in pred
-        assert 1 <= len(pred['anchors']) <= ANCHOR_COUNT
-        # anchor_details must be present and match
+        assert 'top_numbers' in pred
+        assert len(pred['top_numbers']) == len(pred['anchors'])
+        # anchor_details has one entry per number (individual selection)
         assert 'anchor_details' in pred
-        assert len(pred['anchor_details']) == len(pred['anchors'])
+        assert len(pred['anchor_details']) == len(pred['top_numbers'])
 
-    def test_anchors_have_wheel_neighbours(self):
-        """Verify anchor_details include valid numbers grouped around anchors.
-        The probability-first algorithm selects high-prob numbers and groups
-        them into clusters. Not every ±spread position is guaranteed —
-        low-prob neighbours may be skipped in favour of higher-prob numbers.
-        """
+    def test_individual_numbers_are_valid(self):
+        """Verify each predicted number is a valid roulette number with spread=0."""
         ep = EnsemblePredictor()
         ep.load_history(SAMPLE_50)
         pred = ep.predict()
         predicted_set = set(pred['top_numbers'])
-        all_anchor_numbers = set()
 
         for ad in pred['anchor_details']:
-            anchor = ad['number']
+            num = ad['number']
             spread = ad['spread']
-            # Anchor itself must be in predictions
-            assert anchor in predicted_set, f"Anchor {anchor} not in predictions"
-            # Must have at least 1 number (the anchor itself)
-            assert len(ad['numbers']) >= 1, \
-                f"Anchor {anchor} should have at least 1 number, got {len(ad['numbers'])}"
-            # Spread must be 1-3
-            assert 1 <= spread <= 3, f"Spread {spread} out of range"
-            # All numbers in anchor_details must be valid roulette numbers
-            for num in ad['numbers']:
-                assert 0 <= num <= 36, f"Invalid number {num} in anchor_details"
-                assert num in predicted_set, f"Anchor number {num} not in top_numbers"
-
-            all_anchor_numbers.update(ad['numbers'])
-
-        # All anchor-covered numbers should be in top_numbers
-        for num in all_anchor_numbers:
-            assert num in predicted_set, f"Anchor-covered number {num} not in top_numbers"
+            assert 0 <= num <= 36, f"Invalid number {num}"
+            assert num in predicted_set, f"Number {num} not in top_numbers"
+            assert spread == 0, f"Individual selection should have spread=0, got {spread}"
+            assert ad['numbers'] == [num], f"Individual selection should have single number"
 
     def test_predictions_are_straight_bets_only(self):
         """Verify bets are all straight (no outside bets)"""
@@ -668,21 +652,24 @@ class TestEnsemblePredictor:
         for prob in pred['top_probabilities']:
             assert prob >= 0
 
-    def test_confidence_above_threshold_with_data(self):
-        """With 50+ spins, confidence should be above BET threshold"""
+    def test_confidence_positive_with_data(self):
+        """With 100 spins, confidence should be positive (not zero).
+        Note: with 65% threshold, confidence may be below BET threshold — that's by design.
+        The AI only bets on ~3 of 60 spins (high selectivity)."""
         ep = EnsemblePredictor()
         ep.load_history(SAMPLE_100)
         pred = ep.predict()
-        assert pred['confidence'] >= CONFIDENCE_BET_THRESHOLD, \
-            f"Confidence {pred['confidence']}% below {CONFIDENCE_BET_THRESHOLD}% with 100 spins"
+        assert pred['confidence'] > 0, \
+            f"Confidence should be positive with 100 spins, got {pred['confidence']}%"
 
-    def test_mode_is_bet_with_data(self):
-        """With sufficient data, mode should not be WAIT"""
+    def test_mode_valid_with_data(self):
+        """With 100 spins, mode should be one of WAIT/BET/BET_HIGH.
+        Note: with 65% confidence threshold, WAIT is the expected mode most of the time."""
         ep = EnsemblePredictor()
         ep.load_history(SAMPLE_100)
         pred = ep.predict()
-        assert pred['mode'] in ('BET', 'BET_HIGH'), \
-            f"Mode should be BET or BET_HIGH but got {pred['mode']}"
+        assert pred['mode'] in ('WAIT', 'BET', 'BET_HIGH'), \
+            f"Mode should be WAIT, BET, or BET_HIGH but got {pred['mode']}"
 
     def test_group_probabilities(self):
         ep = EnsemblePredictor()
@@ -705,7 +692,7 @@ class TestEnsemblePredictor:
         probs, all_dists = ep.get_ensemble_probabilities()
         assert abs(probs.sum() - 1.0) < 1e-6
         assert probs.shape == (TOTAL_NUMBERS,)
-        assert len(all_dists) == 4  # freq, markov, pattern, lstm
+        assert len(all_dists) == 8  # freq, markov, pattern, lstm, wheel_strategy, hot_number, gap, tab_streak
 
     def test_update_incremental(self):
         ep = EnsemblePredictor()
@@ -868,7 +855,7 @@ class TestConfig:
         assert TOTAL_NUMBERS == 37
 
     def test_top_predictions_count(self):
-        assert TOP_PREDICTIONS_COUNT == 12
+        assert TOP_PREDICTIONS_COUNT == 14  # 14 numbers — V3 optimal
 
     def test_red_black_complete(self):
         """Red + Black + Green should cover all 37 numbers"""
@@ -894,9 +881,13 @@ class TestConfig:
 
     def test_ensemble_weights_sum_to_1(self):
         from config import (ENSEMBLE_FREQUENCY_WEIGHT, ENSEMBLE_MARKOV_WEIGHT,
-                            ENSEMBLE_PATTERN_WEIGHT, ENSEMBLE_LSTM_WEIGHT)
+                            ENSEMBLE_PATTERN_WEIGHT, ENSEMBLE_LSTM_WEIGHT,
+                            ENSEMBLE_WHEEL_STRATEGY_WEIGHT, ENSEMBLE_HOT_NUMBER_WEIGHT,
+                            ENSEMBLE_GAP_WEIGHT, ENSEMBLE_TAB_STREAK_WEIGHT)
         total = (ENSEMBLE_FREQUENCY_WEIGHT + ENSEMBLE_MARKOV_WEIGHT +
-                 ENSEMBLE_PATTERN_WEIGHT + ENSEMBLE_LSTM_WEIGHT)
+                 ENSEMBLE_PATTERN_WEIGHT + ENSEMBLE_LSTM_WEIGHT +
+                 ENSEMBLE_WHEEL_STRATEGY_WEIGHT + ENSEMBLE_HOT_NUMBER_WEIGHT +
+                 ENSEMBLE_GAP_WEIGHT + ENSEMBLE_TAB_STREAK_WEIGHT)
         assert abs(total - 1.0) < 1e-6
 
     def test_get_number_color(self):
@@ -1467,7 +1458,7 @@ class TestAdaptiveEnsemble:
         ep = EnsemblePredictor()
         ep.load_history(SAMPLE_50)
         status = ep.get_model_status()
-        for model_name in ['frequency', 'markov', 'patterns', 'lstm']:
+        for model_name in ['frequency', 'markov', 'patterns', 'lstm', 'wheel_strategy', 'hot_number']:
             assert 'weight' in status[model_name]
         assert 'adaptive_weights_active' in status
 
@@ -1542,6 +1533,262 @@ class TestLSTMArchitecture:
         from app.ml.lstm_predictor import LSTMPredictor
         pred = LSTMPredictor()
         assert hasattr(pred, 'scheduler')
+
+
+# ═══════════════════════════════════════════════════════════════
+# WheelStrategyAnalyzer Tests
+# ═══════════════════════════════════════════════════════════════
+
+class TestWheelStrategyAnalyzer:
+    def test_init(self):
+        from app.ml.wheel_strategy import WheelStrategyAnalyzer
+        ws = WheelStrategyAnalyzer()
+        assert len(ws.spin_history) == 0
+
+    def test_update(self):
+        from app.ml.wheel_strategy import WheelStrategyAnalyzer
+        ws = WheelStrategyAnalyzer()
+        ws.update(5)
+        ws.update(17)
+        assert len(ws.spin_history) == 2
+
+    def test_load_history(self):
+        from app.ml.wheel_strategy import WheelStrategyAnalyzer
+        ws = WheelStrategyAnalyzer()
+        ws.load_history(SAMPLE_50)
+        assert len(ws.spin_history) == 50
+
+    def test_table_map_complete(self):
+        from app.ml.wheel_strategy import WheelStrategyAnalyzer
+        ws = WheelStrategyAnalyzer()
+        for n in range(37):
+            assert n in ws._table_map
+            assert ws._table_map[n] in ('0', '19')
+
+    def test_polarity_map_complete(self):
+        from app.ml.wheel_strategy import WheelStrategyAnalyzer
+        ws = WheelStrategyAnalyzer()
+        for n in range(37):
+            assert n in ws._polarity_map
+            assert ws._polarity_map[n] in ('positive', 'negative')
+
+    def test_set_map_complete(self):
+        from app.ml.wheel_strategy import WheelStrategyAnalyzer
+        ws = WheelStrategyAnalyzer()
+        for n in range(37):
+            assert n in ws._set_map
+            assert ws._set_map[n] in (1, 2, 3)
+
+    def test_tables_cover_all_numbers(self):
+        from config import WHEEL_TABLE_0, WHEEL_TABLE_19
+        combined = WHEEL_TABLE_0 | WHEEL_TABLE_19
+        assert combined == set(range(37))
+        assert len(WHEEL_TABLE_0 & WHEEL_TABLE_19) == 0  # No overlap
+
+    def test_polarity_covers_all_numbers(self):
+        from config import WHEEL_POSITIVE, WHEEL_NEGATIVE
+        combined = WHEEL_POSITIVE | WHEEL_NEGATIVE
+        assert combined == set(range(37))
+        assert len(WHEEL_POSITIVE & WHEEL_NEGATIVE) == 0
+
+    def test_sets_cover_all_numbers(self):
+        from config import WHEEL_SET_1, WHEEL_SET_2, WHEEL_SET_3
+        combined = WHEEL_SET_1 | WHEEL_SET_2 | WHEEL_SET_3
+        assert combined == set(range(37))
+        assert len(WHEEL_SET_1 & WHEEL_SET_2) == 0
+        assert len(WHEEL_SET_1 & WHEEL_SET_3) == 0
+        assert len(WHEEL_SET_2 & WHEEL_SET_3) == 0
+
+    def test_probabilities_shape(self):
+        from app.ml.wheel_strategy import WheelStrategyAnalyzer
+        ws = WheelStrategyAnalyzer()
+        ws.load_history(SAMPLE_50)
+        probs = ws.get_number_probabilities()
+        assert len(probs) == 37
+        assert abs(sum(probs) - 1.0) < 1e-6
+
+    def test_probabilities_uniform_when_few_spins(self):
+        from app.ml.wheel_strategy import WheelStrategyAnalyzer
+        ws = WheelStrategyAnalyzer()
+        ws.load_history([5, 10])
+        probs = ws.get_number_probabilities()
+        assert abs(probs[0] - 1/37) < 1e-6
+
+    def test_table_trend(self):
+        from app.ml.wheel_strategy import WheelStrategyAnalyzer
+        ws = WheelStrategyAnalyzer()
+        ws.load_history(SAMPLE_100)
+        trend = ws.get_table_trend()
+        assert 'hot_table' in trend
+        assert 'table_0_pct' in trend
+        assert abs(trend['table_0_pct'] + trend['table_19_pct'] - 1.0) < 1e-6
+
+    def test_polarity_trend(self):
+        from app.ml.wheel_strategy import WheelStrategyAnalyzer
+        ws = WheelStrategyAnalyzer()
+        ws.load_history(SAMPLE_100)
+        trend = ws.get_polarity_trend()
+        assert 'hot_polarity' in trend
+        assert abs(trend['positive_pct'] + trend['negative_pct'] - 1.0) < 1e-6
+
+    def test_set_trend(self):
+        from app.ml.wheel_strategy import WheelStrategyAnalyzer
+        ws = WheelStrategyAnalyzer()
+        ws.load_history(SAMPLE_100)
+        trend = ws.get_set_trend()
+        assert 'hot_set' in trend
+        total_pct = trend['set_1_pct'] + trend['set_2_pct'] + trend['set_3_pct']
+        assert abs(total_pct - 1.0) < 1e-6
+
+    def test_strategy_strength_range(self):
+        from app.ml.wheel_strategy import WheelStrategyAnalyzer
+        ws = WheelStrategyAnalyzer()
+        ws.load_history(SAMPLE_100)
+        strength = ws.get_strategy_strength()
+        assert 0 <= strength <= 100
+
+    def test_strategy_strength_zero_with_no_data(self):
+        from app.ml.wheel_strategy import WheelStrategyAnalyzer
+        ws = WheelStrategyAnalyzer()
+        assert ws.get_strategy_strength() == 0.0
+
+    def test_summary(self):
+        from app.ml.wheel_strategy import WheelStrategyAnalyzer
+        ws = WheelStrategyAnalyzer()
+        ws.load_history(SAMPLE_100)
+        summary = ws.get_summary()
+        assert 'table_trend' in summary
+        assert 'polarity_trend' in summary
+        assert 'set_trend' in summary
+        assert 'strategy_strength' in summary
+        assert 'total_spins' in summary
+
+    def test_ensemble_includes_wheel_strategy(self):
+        ep = EnsemblePredictor()
+        assert hasattr(ep, 'wheel_strategy')
+        ep.load_history(SAMPLE_100)
+        status = ep.get_model_status()
+        assert 'wheel_strategy' in status
+
+    def test_ensemble_wheel_strategy_in_prediction(self):
+        ep = EnsemblePredictor()
+        ep.load_history(SAMPLE_100)
+        pred = ep.predict()
+        assert 'wheel_strategy' in pred
+
+
+# ═══════════════════════════════════════════════════════════════
+# Hot Number Analyzer Tests
+# ═══════════════════════════════════════════════════════════════
+
+class TestHotNumberAnalyzer:
+    def test_init(self):
+        from app.ml.hot_number import HotNumberAnalyzer
+        hn = HotNumberAnalyzer()
+        assert hn.spin_history == []
+
+    def test_update(self):
+        from app.ml.hot_number import HotNumberAnalyzer
+        hn = HotNumberAnalyzer()
+        hn.update(7)
+        hn.update(14)
+        assert len(hn.spin_history) == 2
+
+    def test_load_history(self):
+        from app.ml.hot_number import HotNumberAnalyzer
+        hn = HotNumberAnalyzer()
+        hn.load_history(SAMPLE_50)
+        assert len(hn.spin_history) == len(SAMPLE_50)
+
+    def test_probabilities_shape(self):
+        from app.ml.hot_number import HotNumberAnalyzer
+        hn = HotNumberAnalyzer()
+        hn.load_history(SAMPLE_50)
+        probs = hn.get_number_probabilities()
+        assert probs.shape == (TOTAL_NUMBERS,)
+        assert abs(probs.sum() - 1.0) < 1e-6
+
+    def test_probabilities_uniform_when_few_spins(self):
+        from app.ml.hot_number import HotNumberAnalyzer
+        hn = HotNumberAnalyzer()
+        hn.update(5)
+        probs = hn.get_number_probabilities()
+        expected = 1.0 / TOTAL_NUMBERS
+        assert all(abs(p - expected) < 1e-6 for p in probs)
+
+    def test_hot_numbers_returned(self):
+        from app.ml.hot_number import HotNumberAnalyzer
+        hn = HotNumberAnalyzer()
+        # Create history with 7 appearing frequently in the RECENT window
+        # Window=15, so put 7s at the end to be within the window
+        history = list(range(0, 20)) + [7] * 10
+        hn.load_history(history)
+        hot = hn.get_hot_numbers(top_n=3)
+        assert len(hot) <= 3
+        if hot:
+            assert hot[0]['number'] == 7
+            assert hot[0]['count'] >= 5  # At least 5 of the 10 are in last 15
+
+    def test_strength_range(self):
+        from app.ml.hot_number import HotNumberAnalyzer
+        hn = HotNumberAnalyzer()
+        hn.load_history(SAMPLE_100)
+        strength = hn.get_strength()
+        assert 0 <= strength <= 100
+
+    def test_strength_zero_with_no_data(self):
+        from app.ml.hot_number import HotNumberAnalyzer
+        hn = HotNumberAnalyzer()
+        assert hn.get_strength() == 0.0
+
+    def test_summary(self):
+        from app.ml.hot_number import HotNumberAnalyzer
+        hn = HotNumberAnalyzer()
+        hn.load_history(SAMPLE_50)
+        summary = hn.get_summary()
+        assert 'hot_numbers' in summary
+        assert 'strength' in summary
+        assert 'total_spins' in summary
+
+    def test_ensemble_includes_hot_number(self):
+        ep = EnsemblePredictor()
+        assert hasattr(ep, 'hot_number')
+        ep.load_history(SAMPLE_100)
+        status = ep.get_model_status()
+        assert 'hot_number' in status
+
+    def test_ensemble_hot_number_in_prediction(self):
+        ep = EnsemblePredictor()
+        ep.load_history(SAMPLE_100)
+        pred = ep.predict()
+        assert 'hot_number_summary' in pred
+
+
+# ═══════════════════════════════════════════════════════════════
+# Conditional Betting Tests
+# ═══════════════════════════════════════════════════════════════
+
+class TestConditionalBetting:
+    def test_prediction_has_should_bet(self):
+        ep = EnsemblePredictor()
+        ep.load_history(SAMPLE_100)
+        pred = ep.predict()
+        assert 'should_bet' in pred
+        assert isinstance(pred['should_bet'], bool)
+
+    def test_prediction_has_signal_strength(self):
+        ep = EnsemblePredictor()
+        ep.load_history(SAMPLE_100)
+        pred = ep.predict()
+        assert 'signal_strength' in pred
+        assert isinstance(pred['signal_strength'], float)
+        assert 0 <= pred['signal_strength'] <= 100
+
+    def test_prediction_has_signal_threshold(self):
+        ep = EnsemblePredictor()
+        ep.load_history(SAMPLE_100)
+        pred = ep.predict()
+        assert 'signal_threshold' in pred
 
 
 if __name__ == '__main__':

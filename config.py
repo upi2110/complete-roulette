@@ -9,28 +9,31 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # ─── Bankroll Settings ───────────────────────────────────────────────
 INITIAL_BANKROLL = 4000.0
-BASE_BET = 1.0                      # Starting bet per number ($1)
-SESSION_TARGET = 100.0
-STOP_LOSS_THRESHOLD = 3000.0        # Protection mode if bankroll drops below this
-MAX_CONSECUTIVE_LOSSES = 5          # After this many losses, require higher confidence to bet (was 3 — too aggressive)
+BASE_BET = 7.50                     # THE ONE unit size — $7.50 per unit
+SESSION_TARGET = 999999.0           # Effectively disabled — no profit cap, let winners run
+STOP_LOSS_THRESHOLD = 3500.0        # Stop at $500 loss ($4000 - $500 = $3500)
+MAX_CONSECUTIVE_LOSSES = 99         # DISABLED — never block betting due to loss streak
 KELLY_FRACTION = 0.25               # (Legacy — kept for compatibility)
-MAX_BET_MULTIPLIER = 20.0           # Max bet per number = BASE_BET * this
+MAX_BET_MULTIPLIER = 15.0           # Sequence peak ×15 = $112.50 per number
 RECOVERY_BET_FACTOR = 0.75          # (Legacy — kept for compatibility)
 
-# ─── Incremental Betting Strategy ───────────────────────────────────
-BET_INCREMENT = 1.0                 # +$1 after LOSSES_BEFORE_INCREMENT consecutive losses
-BET_DECREMENT = 1.0                 # -$1 after WINS_BEFORE_DECREMENT consecutive wins
-MIN_BET = 1.0                       # Floor for bet per number
-LOSSES_BEFORE_INCREMENT = 3         # Consecutive losses before bet increases
-WINS_BEFORE_DECREMENT = 2           # Consecutive wins before bet decreases
+# ─── Sequence Betting Strategy (THE ONE) ────────────────────────────
+# 1-3-2-6 variant: multipliers applied to BASE_BET ($7.50 unit).
+# On WIN: advance to next step. On LOSS: reset to step 0.
+# Marathon winner: $102.92 avg, P/R 0.152, tested on 1.57B sessions.
+# Bet amounts at each step: $7.50, $45, $97.50, $112.50, $67.50
+BET_SEQUENCE = [1, 6, 13, 15, 9]    # Multipliers × BASE_BET
+MIN_BET = 1.0                       # Floor: never go below $1 per number
+SESSION_TARGET_ENABLED = False       # No profit cap — let winners run
 
-# ─── Confidence Thresholds ───────────────────────────────────────────
-# Lowered from 45/55/65 → 40/50/60 so the system can actually bet.
-# With 6-factor scoring, neutral = ~50. Requiring 55 after losses was unachievable.
-CONFIDENCE_BET_THRESHOLD = 40.0     # Reduced: was 45 — too hard to reach after losses
-CONFIDENCE_HIGH_THRESHOLD = 50.0    # Reduced: was 55 — loss-streak caution requires this
-CONFIDENCE_STRAIGHT_THRESHOLD = 60.0  # Reduced: was 65
-FORCED_WAIT_SPINS = 0               # No forced wait — AI decides via confidence
+# ─── Confidence Thresholds (THE ONE) ─────────────────────────────────
+# Only bet when AI confidence >= 65 AND should_bet = True.
+# Marathon proven: patience is the edge. Skip ~57 of 60 spins.
+CONFIDENCE_BET_THRESHOLD = 65.0     # Only bet when AI confidence >= 65%
+CONFIDENCE_HIGH_THRESHOLD = 65.0    # Same threshold — no tiered behavior
+CONFIDENCE_STRAIGHT_THRESHOLD = 65.0 # Consistent gating
+FORCED_WAIT_SPINS = 0               # No forced waits
+WAIT_AFTER_LOSS_SPINS = 0           # No cooldown after losses
 
 # ─── Confidence Weights ──────────────────────────────────────────────
 # Balanced 6-factor weighting. Sample size is reliably high (97/100 with 2000+ spins)
@@ -79,8 +82,9 @@ CALIBRATION_MIN_SAMPLES = 10        # Min samples per bin before calibrating
 
 # ─── Time-Weighted Frequencies ───────────────────────────────────────
 FREQUENCY_DECAY_FACTOR = 0.998      # Per-spin decay (half-life ~350 spins)
-FREQUENCY_FLAT_WEIGHT = 0.80        # Backtest: 100% flat beat all blends — using 80/20 for some recency
-FREQUENCY_RECENT_WEIGHT = 0.20      # Reduced from 0.65 — flat distribution more reliable
+FREQUENCY_FLAT_WEIGHT = 0.50        # Backtest-optimized: 50/50 blend with window=30 gives +1.71% edge
+FREQUENCY_RECENT_WEIGHT = 0.50      # Recent 30 spins captures short-term patterns — was 0.20
+FREQUENCY_RECENT_WINDOW = 30        # Last 30 spins for recent frequency — sweet spot from backtest
 
 # ─── Loss-Reactive Strategy ────────────────────────────────────────────
 # After consecutive misses, diversify predictions to explore new sectors.
@@ -131,15 +135,29 @@ ODD_NUMBERS = {n for n in range(1, 37) if n % 2 == 1}
 EVEN_NUMBERS = {n for n in range(1, 37) if n % 2 == 0}
 
 TOTAL_NUMBERS = 37  # 0-36
-TOP_PREDICTIONS_MAX = 12     # Safety cap — AI can pick up to this many numbers
-TOP_PREDICTIONS_COUNT = 12   # Legacy — kept for compatibility with tests
+TOP_PREDICTIONS_MAX = 14     # 14 numbers: coverage=37.8%, V3 optimal
+TOP_PREDICTIONS_COUNT = 14   # 14 numbers — best balance of hit rate vs profit per hit
 ANCHOR_COUNT = 4             # Legacy — kept for compatibility
-NEIGHBOURS_PER_ANCHOR = 2    # Neighbours each side of anchor on wheel (±2)
+NEIGHBOURS_PER_ANCHOR = 2    # ±2 is optimal — backtest: ±2=32.87%, ±1=32.24%, ±3=31.94%
 
 # ─── Dynamic Prediction Threshold ───────────────────────────────────
 # AI picks numbers whose probability exceeds uniform (1/37) by this factor.
 # factor=1.0 means pick anything above average. factor=1.3 means 30% above average.
-PREDICTION_CONFIDENCE_FACTOR = 1.5  # Pick numbers ≥ 1.5× the uniform probability
+PREDICTION_CONFIDENCE_FACTOR = 1.05  # Target ~14 numbers above threshold — V3 optimal N=14
+
+# ─── Wheel Strategy Groups (physical wheel-based sector strategy) ─────
+# Two semicircles of the European wheel, split at 0 and opposite side
+WHEEL_TABLE_0 = {3, 26, 0, 32, 21, 2, 25, 27, 13, 36, 23, 10, 5, 1, 20, 14, 18, 29, 7}   # 19 numbers
+WHEEL_TABLE_19 = {15, 19, 4, 17, 34, 6, 11, 30, 8, 24, 16, 33, 31, 9, 22, 28, 12, 35}     # 18 numbers
+
+# Positive/Negative classification — alternating groups of 3 on the physical wheel
+WHEEL_POSITIVE = {3, 26, 0, 32, 15, 19, 4, 27, 13, 36, 11, 30, 8, 1, 20, 14, 31, 9, 22}   # 19 numbers
+WHEEL_NEGATIVE = {21, 2, 25, 17, 34, 6, 23, 10, 5, 24, 16, 33, 18, 29, 7, 28, 12, 35}     # 18 numbers
+
+# Three balanced sets for sector-based betting
+WHEEL_SET_1 = {32, 15, 25, 17, 36, 11, 5, 24, 14, 31, 7, 28}   # 12 numbers
+WHEEL_SET_2 = {4, 21, 6, 27, 8, 23, 33, 1, 22, 18, 35, 3}      # 12 numbers
+WHEEL_SET_3 = {0, 26, 19, 2, 34, 13, 30, 10, 16, 20, 9, 29, 12} # 13 numbers (covers remainder)
 
 # ─── Wheel Sectors (groups of adjacent numbers on physical wheel) ────
 def get_wheel_sectors():
@@ -198,12 +216,41 @@ DEBUG = False                       # Was True — caused 100%+ CPU and slow res
 SECRET_KEY = 'roulette-ai-prediction-system-2024'
 
 # ─── Ensemble Weights ────────────────────────────────────────────────
-# Markov strongest in real-time play. LSTM overfits on training data (59.6%
-# backtest was memorisation, not prediction). Keep LSTM meaningful but not dominant.
-ENSEMBLE_FREQUENCY_WEIGHT = 0.30
-ENSEMBLE_MARKOV_WEIGHT = 0.40
-ENSEMBLE_PATTERN_WEIGHT = 0.05
-ENSEMBLE_LSTM_WEIGHT = 0.25
+# V3 Marathon optimized (59,242 strategies, 23.5 hours, 3,781 real spins):
+#   gap+tab_streak dominated all 33 models tested — 62%/38% optimal ratio
+#   Best result: gap(62%)+tab_streak(38%) N=14 → +$117/session, 58% win rate
+#   Frequency and wheel_strategy provide stable baseline diversity
+#   Markov/LSTM still disabled (hurt predictions)
+ENSEMBLE_GAP_WEIGHT = 0.35          # Gap/contrarian (mean reversion) — V3 dominant model
+ENSEMBLE_TAB_STREAK_WEIGHT = 0.22   # Table streak patterns — V3 breakthrough model
+ENSEMBLE_FREQUENCY_WEIGHT = 0.20    # Frequency — reliable baseline
+ENSEMBLE_WHEEL_STRATEGY_WEIGHT = 0.13  # Wheel strategy (0/19, pos/neg, sets)
+ENSEMBLE_MARKOV_WEIGHT = 0.00       # DISABLED: Markov hurts predictions (-2%)
+ENSEMBLE_PATTERN_WEIGHT = 0.05      # Small pattern diversity
+ENSEMBLE_LSTM_WEIGHT = 0.00         # DISABLED: overfits
+ENSEMBLE_HOT_NUMBER_WEIGHT = 0.05   # Hot number boost
+
+# ─── Wheel Strategy Settings ────────────────────────────────────────
+# Backtest sweep found window=50, boost=1.30 gives best edge (+1.67%)
+# Shorter windows (10-20) are anti-correlated → trends need time to stabilize
+WHEEL_STRATEGY_RECENT_WINDOW = 50   # Last 50 spins — optimal from backtest sweep
+WHEEL_STRATEGY_TREND_BOOST = 1.30   # Moderate boost — best from backtest (1.30 > 1.40)
+WHEEL_STRATEGY_COLD_DAMPEN = 0.70   # Dampen cold groups (mirrors boost)
+
+# ─── Hot Number Settings ────────────────────────────────────────────
+# Numbers appearing frequently in short recent window get boosted.
+# Backtest: window=15, boost=2.0 optimal at 8% ensemble weight.
+HOT_NUMBER_WINDOW = 15              # Short window to detect recent repeats
+HOT_NUMBER_BOOST_FACTOR = 2.0       # 2× boost for hot numbers
+
+# ─── Conditional Betting (Signal Strength Gate) ─────────────────────
+# Only bet when wheel strategy signal strength exceeds threshold.
+# Backtest results:
+#   thresh=25 → 34.54% hit, +2.11% edge, $1908 profit (bet 59% of spins)
+#   thresh=30 → 35.92% hit, +3.48% edge, $2772 profit (bet 40% of spins)
+# Default: thresh=25 for good balance of frequency and accuracy.
+# Set to 0 to disable conditional betting (always bet).
+CONDITIONAL_BET_THRESHOLD = 25      # Minimum signal strength to place bet (0-100, 0=always bet)
 
 # ─── Color Mapping for UI ────────────────────────────────────────────
 def get_number_color(number):

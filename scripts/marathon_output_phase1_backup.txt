@@ -1,0 +1,218 @@
+========================================================================================================================
+MARATHON STRATEGY SEARCH — 12-hour autonomous run
+Started: 2026-02-12 23:55:14
+========================================================================================================================
+
+Loaded 3275 spins from 7 files:
+  data1.txt: 511 spins
+  data2.txt: 507 spins
+  data3.txt: 509 spins
+  data4.txt: 562 spins
+  data5.txt: 439 spins
+  data6 copy.txt: 507 spins
+  data7.txt: 240 spins
+
+========================================================================================================================
+PHASE 1: 2-MODEL FINE SWEEP (1% steps)
+Time: 0min elapsed, 720min remaining | Tested: 0
+========================================================================================================================
+  freq(98%)+freq_decay(2%) = 33.21% edge=+0.78%
+  freq(80%)+polarity(20%) = 33.96% edge=+1.53%
+  freq(79%)+pol_contra(21%) = 33.46% edge=+1.03%
+  freq(83%)+table(17%) = 33.15% edge=+0.71%
+  freq(57%)+tab_contra(43%) = 33.65% edge=+1.21%
+  freq(22%)+set(78%) = 33.52% edge=+1.09%
+  freq(72%)+hot(28%) = 33.77% edge=+1.34%
+  freq(82%)+cold(18%) = 33.15% edge=+0.71%
+  freq(92%)+sector(8%) = 34.08% edge=+1.65%
+  freq(93%)+neighbor(7%) = 33.3% edge=+0.87%
+  freq(85%)+repeater(15%) = 33.27% edge=+0.84%
+  freq(76%)+gap(24%) = 33.4% edge=+0.96%
+  freq(55%)+markov(45%) = 33.4% edge=+0.96%
+  freq(90%)+markov2(10%) = 33.4% edge=+0.96%
+  freq(97%)+dozen(3%) = 33.21% edge=+0.78%
+  freq(45%)+column(55%) = 33.62% edge=+1.18%
+  freq(76%)+red_black(24%) = 33.58% edge=+1.15%
+  freq(74%)+odd_even(26%) = 33.8% edge=+1.37%
+  freq(81%)+high_low(19%) = 33.49% edge=+1.06%
+  freq_decay(17%)+polarity(83%) = 32.8% edge=+0.37%
+  freq_decay(48%)+pol_contra(52%) = 32.61% edge=+0.18%
+  freq_decay(27%)+tab_contra(73%) = 33.11% edge=+0.68%
+  freq_decay(7%)+set(93%) = 32.96% edge=+0.53%
+  freq_decay(90%)+hot(10%) = 32.64% edge=+0.21%
+  freq_decay(5%)+sector(95%) = 33.9% edge=+1.46%
+  freq_decay(57%)+neighbor(43%) = 32.93% edge=+0.49%
+  freq_decay(80%)+repeater(20%) = 32.86% edge=+0.43%
+  freq_decay(26%)+gap(74%) = 33.02% edge=+0.59%
+  freq_decay(5%)+markov(95%) = 32.99% edge=+0.56%
+  freq_decay(5%)+markov2(95%) = 32.77% edge=+0.34%
+  freq_decay(31%)+dozen(69%) = 33.21% edge=+0.78%
+  freq_decay(35%)+column(65%) = 32.9% edge=+0.46%
+  freq_decay(21%)+red_black(79%) = 33.02% edge=+0.59%
+  freq_decay(30%)+odd_even(70%) = 32.49% edge=+0.06%
+  freq_decay(16%)+high_low(84%) = 33.21% edge=+0.78%
+  polarity(58%)+table(42%) = 32.58% edge=+0.15%
+  polarity(90%)+tab_contra(10%) = 32.64% edge=+0.21%
+  polarity(95%)+hot(5%) = 33.65% edge=+1.21%
+  polarity(73%)+cold(27%) = 33.36% edge=+0.93%
+  polarity(51%)+sector(49%) = 33.11% edge=+0.68%
+  polarity(77%)+neighbor(23%) = 33.15% edge=+0.71%
+  polarity(98%)+repeater(2%) = 32.99% edge=+0.56%
+  polarity(5%)+gap(95%) = 32.61% edge=+0.18%
+  polarity(86%)+markov(14%) = 33.62% edge=+1.18%
+  polarity(95%)+column(5%) = 32.68% edge=+0.24%
+  polarity(55%)+odd_even(45%) = 32.74% edge=+0.31%
+  polarity(5%)+high_low(95%) = 33.36% edge=+0.93%
+  pol_contra(45%)+table(55%) = 32.86% edge=+0.43%
+  pol_contra(85%)+set(15%) = 32.46% edge=+0.02%
+  pol_contra(5%)+hot(95%) = 33.43% edge=+0.99%
+  pol_contra(55%)+sector(45%) = 33.05% edge=+0.62%
+  pol_contra(94%)+neighbor(6%) = 32.71% edge=+0.27%
+  pol_contra(90%)+repeater(10%) = 32.61% edge=+0.18%
+  pol_contra(75%)+gap(25%) = 32.58% edge=+0.15%
+  pol_contra(60%)+markov(40%) = 32.74% edge=+0.31%
+  pol_contra(60%)+column(40%) = 32.93% edge=+0.49%
+  pol_contra(20%)+red_black(80%) = 33.65% edge=+1.21%
+  pol_contra(82%)+odd_even(18%) = 33.49% edge=+1.06%
+  pol_contra(10%)+high_low(90%) = 33.74% edge=+1.31%
+  table(5%)+tab_contra(95%) = 32.64% edge=+0.21%
+  table(30%)+set(70%) = 33.24% edge=+0.81%
+  table(95%)+hot(5%) = 32.61% edge=+0.18%
+  table(70%)+cold(30%) = 32.61% edge=+0.18%
+  table(52%)+sector(48%) = 32.74% edge=+0.31%
+  table(25%)+neighbor(75%) = 32.55% edge=+0.12%
+  table(61%)+repeater(39%) = 33.15% edge=+0.71%
+  table(54%)+gap(46%) = 33.3% edge=+0.87%
+  table(5%)+markov(95%) = 33.77% edge=+1.34%
+  table(61%)+column(39%) = 32.52% edge=+0.09%
+  table(82%)+odd_even(18%) = 34.37% edge=+1.93%
+  table(50%)+high_low(50%) = 33.68% edge=+1.25%
+  tab_contra(10%)+set(90%) = 32.61% edge=+0.18%
+  tab_contra(76%)+hot(24%) = 32.8% edge=+0.37%
+  tab_contra(65%)+cold(35%) = 32.8% edge=+0.37%
+  tab_contra(75%)+sector(25%) = 33.49% edge=+1.06%
+  tab_contra(85%)+neighbor(15%) = 33.15% edge=+0.71%
+  tab_contra(5%)+repeater(95%) = 32.86% edge=+0.43%
+  tab_contra(35%)+gap(65%) = 33.99% edge=+1.56%
+  tab_contra(74%)+markov(26%) = 33.3% edge=+0.87%
+  tab_contra(90%)+dozen(10%) = 32.64% edge=+0.21%
+  tab_contra(85%)+column(15%) = 32.46% edge=+0.02%
+  tab_contra(31%)+red_black(69%) = 33.18% edge=+0.74%
+  tab_contra(41%)+odd_even(59%) = 33.4% edge=+0.96%
+  tab_contra(65%)+high_low(35%) = 34.18% edge=+1.75%
+  set(84%)+hot(16%) = 34.12% edge=+1.68%
+  set(69%)+sector(31%) = 34.3% edge=+1.87%
+  set(95%)+neighbor(5%) = 32.93% edge=+0.49%
+  set(55%)+markov(45%) = 32.83% edge=+0.40%
+  set(88%)+red_black(12%) = 32.58% edge=+0.15%
+  set(20%)+odd_even(80%) = 34.24% edge=+1.81%
+  set(22%)+high_low(78%) = 33.83% edge=+1.40%
+  hot(37%)+cold(63%) = 33.49% edge=+1.06%
+  hot(30%)+sector(70%) = 33.49% edge=+1.06%
+  hot(24%)+neighbor(76%) = 33.05% edge=+0.62%
+  hot(41%)+gap(59%) = 33.46% edge=+1.03%
+  hot(5%)+markov(95%) = 32.93% edge=+0.49%
+  hot(75%)+markov2(25%) = 33.02% edge=+0.59%
+  hot(31%)+column(69%) = 33.15% edge=+0.71%
+  hot(20%)+red_black(80%) = 32.71% edge=+0.27%
+  hot(21%)+odd_even(79%) = 32.74% edge=+0.31%
+  hot(1%)+high_low(99%) = 33.68% edge=+1.25%
+  cold(50%)+sector(50%) = 32.9% edge=+0.46%
+  cold(65%)+repeater(35%) = 32.8% edge=+0.37%
+  cold(5%)+gap(95%) = 32.61% edge=+0.18%
+  cold(95%)+markov(5%) = 33.62% edge=+1.18%
+  cold(5%)+markov2(95%) = 32.71% edge=+0.27%
+  cold(50%)+red_black(50%) = 32.74% edge=+0.31%
+  cold(11%)+odd_even(89%) = 32.74% edge=+0.31%
+  cold(11%)+high_low(89%) = 33.58% edge=+1.15%
+  sector(18%)+neighbor(82%) = 33.02% edge=+0.59%
+  sector(62%)+repeater(38%) = 33.68% edge=+1.25%
+  sector(5%)+gap(95%) = 33.55% edge=+1.12%
+  sector(47%)+markov(53%) = 33.74% edge=+1.31%
+  sector(73%)+markov2(27%) = 33.3% edge=+0.87%
+  sector(53%)+dozen(47%) = 33.11% edge=+0.68%
+  sector(48%)+column(52%) = 33.4% edge=+0.96%
+  sector(43%)+red_black(57%) = 33.11% edge=+0.68%
+  sector(39%)+odd_even(61%) = 33.9% edge=+1.46%
+  sector(48%)+high_low(52%) = 33.52% edge=+1.09%
+  neighbor(87%)+repeater(13%) = 32.96% edge=+0.53%
+  neighbor(20%)+gap(80%) = 33.05% edge=+0.62%
+  neighbor(56%)+markov(44%) = 33.27% edge=+0.84%
+  neighbor(93%)+markov2(7%) = 32.46% edge=+0.02%
+  neighbor(68%)+column(32%) = 32.52% edge=+0.09%
+  neighbor(5%)+red_black(95%) = 32.71% edge=+0.27%
+  neighbor(5%)+odd_even(95%) = 33.52% edge=+1.09%
+  neighbor(10%)+high_low(90%) = 32.61% edge=+0.18%
+  repeater(5%)+gap(95%) = 32.99% edge=+0.56%
+  repeater(5%)+markov(95%) = 32.58% edge=+0.15%
+  repeater(30%)+column(70%) = 32.71% edge=+0.27%
+  repeater(15%)+red_black(85%) = 32.9% edge=+0.46%
+  repeater(22%)+odd_even(78%) = 33.33% edge=+0.90%
+  repeater(3%)+high_low(97%) = 33.4% edge=+0.96%
+  gap(81%)+markov(19%) = 33.49% edge=+1.06%
+  gap(95%)+markov2(5%) = 32.86% edge=+0.43%
+  gap(75%)+dozen(25%) = 33.24% edge=+0.81%
+  gap(75%)+column(25%) = 33.02% edge=+0.59%
+  gap(57%)+red_black(43%) = 32.8% edge=+0.37%
+  gap(7%)+odd_even(93%) = 33.43% edge=+0.99%
+  gap(7%)+high_low(93%) = 33.87% edge=+1.43%
+  markov(65%)+markov2(35%) = 32.9% edge=+0.46%
+  markov(59%)+dozen(41%) = 32.71% edge=+0.27%
+  markov(46%)+column(54%) = 33.55% edge=+1.12%
+  markov(7%)+red_black(93%) = 33.15% edge=+0.71%
+  markov(22%)+odd_even(78%) = 33.58% edge=+1.15%
+  markov(1%)+high_low(99%) = 34.18% edge=+1.75%
+  markov2(15%)+column(85%) = 32.8% edge=+0.37%
+  markov2(11%)+odd_even(89%) = 33.02% edge=+0.59%
+  markov2(2%)+high_low(98%) = 33.77% edge=+1.34%
+  dozen(1%)+odd_even(99%) = 33.05% edge=+0.62%
+  dozen(8%)+high_low(92%) = 33.05% edge=+0.62%
+  column(35%)+odd_even(65%) = 33.11% edge=+0.68%
+  column(6%)+high_low(94%) = 33.74% edge=+1.31%
+  red_black(10%)+high_low(90%) = 33.05% edge=+0.62%
+  odd_even(60%)+high_low(40%) = 33.3% edge=+0.87%
+
+  Top 10 pairs:
+    table(82%)+odd_even(18%) → 34.37% $+2376
+    set(69%)+sector(31%) → 34.3% $+2232
+    set(20%)+odd_even(80%) → 34.24% $+2088
+    tab_contra(65%)+high_low(35%) → 34.18% $+1944
+    markov(1%)+high_low(99%) → 34.18% $+1944
+    set(84%)+hot(16%) → 34.12% $+1800
+    freq(92%)+sector(8%) → 34.08% $+1728
+    tab_contra(35%)+gap(65%) → 33.99% $+1512
+    freq(80%)+polarity(20%) → 33.96% $+1440
+    freq_decay(5%)+sector(95%) → 33.9% $+1296
+
+  ==============================================================================================================
+  AFTER PHASE 1 (min 100 bets)
+  ==============================================================================================================
+    # Config                                                                  Bets   Hit%    Edge   Profit  Bet%
+  ---------------------------------------------------------------------------------------------------------
+    1 table(82%)+odd_even(18%)                                                3195  34.37   +1.93 $  +2376  100%
+    2 table(83%)+odd_even(17%)                                                3195  34.37   +1.93 $  +2376  100%
+    3 table(85%)+odd_even(15%)                                                3195  34.33   +1.90 $  +2304  100%
+    4 table(85%)+odd_even(15%)                                                3195  34.33   +1.90 $  +2304  100%
+    5 table(95%)+odd_even(5%)                                                 3195  34.30   +1.87 $  +2232  100%
+    6 table(86%)+odd_even(14%)                                                3195  34.30   +1.87 $  +2232  100%
+    7 set(69%)+sector(31%)                                                    3195  34.30   +1.87 $  +2232  100%
+    8 table(90%)+odd_even(10%)                                                3195  34.27   +1.84 $  +2160  100%
+    9 table(84%)+odd_even(16%)                                                3195  34.27   +1.84 $  +2160  100%
+   10 table(87%)+odd_even(13%)                                                3195  34.27   +1.84 $  +2160  100%
+   11 table(88%)+odd_even(12%)                                                3195  34.27   +1.84 $  +2160  100%
+   12 table(89%)+odd_even(11%)                                                3195  34.27   +1.84 $  +2160  100%
+   13 set(70%)+sector(30%)                                                    3195  34.27   +1.84 $  +2160  100%
+   14 set(70%)+sector(30%)                                                    3195  34.27   +1.84 $  +2160  100%
+   15 set(20%)+odd_even(80%)                                                  3195  34.24   +1.81 $  +2088  100%
+
+========================================================================================================================
+PHASE 2: 3-MODEL COMBOS (5% steps)
+Time: 58min elapsed, 662min remaining | Tested: 5320
+========================================================================================================================
+  ... 5000 tested, 132min
+  ... 10000 tested, 172min
+  ... 15000 tested, 214min
+  ... 20000 tested, 282min
+  ... 25000 tested, 397min
+  ... 30000 tested, 470min
+  ... 35000 tested, 576min

@@ -14,7 +14,7 @@ sys.path.insert(0, '.')
 from config import get_number_color, PAYOUTS, RED_NUMBERS, BLACK_NUMBERS, \
     FIRST_DOZEN, SECOND_DOZEN, THIRD_DOZEN, LOW_NUMBERS, HIGH_NUMBERS, \
     ODD_NUMBERS, EVEN_NUMBERS, TOP_PREDICTIONS_COUNT, RETRAIN_INTERVAL, \
-    USERDATA_DIR
+    USERDATA_DIR, ENSEMBLE_LSTM_WEIGHT
 
 from app.ml.ensemble import EnsemblePredictor
 from app.money.bankroll_manager import BankrollManager
@@ -105,9 +105,6 @@ def handle_connect():
 def handle_start_session():
     global current_state
 
-    # Check cache freshness BEFORE create_session writes a new JSON file
-    cache_is_fresh = predictor.is_state_fresh()
-
     session_id = session_mgr.create_session()
     current_state['session_active'] = True
     current_state['session_start_time'] = time.time()
@@ -118,43 +115,45 @@ def handle_start_session():
     sid = request.sid
 
     def _do_start():
-        """Load model state: use what's in memory, cache, or rebuild from sessions."""
+        """Load model state: use what's in memory, cache, or rebuild from sessions.
+
+        Priority order:
+        1. Memory — predictor already has data (from Train AI or previous session)
+        2. Pickle cache — authoritative saved state (includes userdata training)
+        3. Session JSON rebuild — last resort if no pickle exists
+        """
         total_spins = 0
         clusters_loaded = 0
         load_mode = 'none'
 
-        # If predictor already has data in memory (from startup auto-load
-        # or a previous Train AI), skip redundant disk loading
+        # 1. MEMORY: predictor already has data in memory
         if len(predictor.spin_history) > 0:
             total_spins = len(predictor.spin_history)
             load_mode = 'memory'
-            # Re-save so cache stays newer than the empty session file
-            predictor.save_state()
-            print(f"[Session] Using existing model state: {total_spins} spins")
+            print(f"[Session] Using existing model state: {total_spins} spins (memory)")
 
-        elif cache_is_fresh:
-            # FAST PATH: load from cached pickle (~instant)
-            if predictor.load_state():
-                total_spins = len(predictor.spin_history)
-                load_mode = 'cache'
-                predictor.save_state()
-                print(f"[Session] Fast start from cache: {total_spins} spins")
+        # 2. PICKLE CACHE: always try loading — it has the authoritative state
+        #    including userdata training data that session files don't have
+        if load_mode == 'none' and predictor.load_state():
+            total_spins = len(predictor.spin_history)
+            load_mode = 'cache'
+            print(f"[Session] Loaded model state from cache: {total_spins} spins")
 
+        # 3. SESSION REBUILD: last resort — only session file data (no userdata)
         if load_mode == 'none':
-            # SLOW PATH: rebuild from session JSON files
             clusters = session_mgr.get_all_training_clusters()
             if clusters:
                 cluster_result = predictor.load_clusters(clusters)
                 total_spins = cluster_result['total_spins']
                 clusters_loaded = cluster_result['clusters_loaded']
                 eventlet.sleep(0)
-            # Save state for fast next start
             predictor.save_state()
             load_mode = 'rebuild'
+            print(f"[Session] Rebuilt from session files: {total_spins} spins ({clusters_loaded} clusters)")
 
             # Train LSTM in background AFTER session_started is emitted
-            # so the UI responds instantly
-            if predictor.lstm.can_train():
+            # so the UI responds instantly (skip if LSTM weight is 0)
+            if ENSEMBLE_LSTM_WEIGHT > 0 and predictor.lstm.can_train():
                 def _bg_train():
                     result = predictor.train_lstm()
                     predictor.save_state()
@@ -204,7 +203,7 @@ def handle_end_session():
         if len(predictor.spin_history) == 0 and spin_count_before > 0:
             print("[EndSession] Skipping background save — reset detected")
             return
-        if predictor.lstm.can_train():
+        if ENSEMBLE_LSTM_WEIGHT > 0 and predictor.lstm.can_train():
             result = predictor.train_lstm()
             socketio.emit('training_update', result, to=sid)
         predictor.save_state()
@@ -250,8 +249,14 @@ def handle_get_prediction():
 
     prediction = predictor.predict()
 
-    # Check if we should bet
+    # Check if we should bet (bankroll + signal gate)
     should_bet, reason = bankroll.should_bet(prediction['confidence'], prediction['mode'])
+
+    # Signal gate: skip betting when wheel strategy signal is weak
+    signal_gated = False
+    if should_bet and not prediction.get('should_bet', True):
+        signal_gated = True
+        reason = f"SKIP — Signal weak ({prediction.get('signal_strength', 0)}/{prediction.get('signal_threshold', 0)})"
 
     # Calculate bet amount — straight bets on all predicted numbers (dynamic count)
     n_preds = len(prediction['top_numbers'])
@@ -259,7 +264,7 @@ def handle_get_prediction():
     total_bet = round(bet_per_number * n_preds, 2)
 
     recommended_bet = None
-    if should_bet and prediction['top_numbers']:
+    if should_bet and not signal_gated and prediction['top_numbers']:
         recommended_bet = {
             'type': 'straight',
             'value': str(prediction['anchors'][0]) if prediction.get('anchors') else str(prediction['top_numbers'][0]),
@@ -280,7 +285,8 @@ def handle_get_prediction():
 
     response = {
         'prediction': prediction,
-        'should_bet': should_bet,
+        'should_bet': should_bet and not signal_gated,
+        'signal_gated': signal_gated,
         'bet_reason': reason,
         'recommended_bet': recommended_bet,
         'bet_amount': bet_per_number,
@@ -359,7 +365,8 @@ def handle_submit_spin(data):
     predictor.update(number)
 
     # Auto-retrain LSTM in background if enough new spins have accumulated
-    if predictor.lstm.needs_retrain(RETRAIN_INTERVAL):
+    # Skip if LSTM weight is 0 (disabled in ensemble)
+    if ENSEMBLE_LSTM_WEIGHT > 0 and predictor.lstm.needs_retrain(RETRAIN_INTERVAL):
         _sid = request.sid
         def _bg_retrain():
             result = predictor.train_lstm()
@@ -375,12 +382,18 @@ def handle_submit_spin(data):
     next_prediction = predictor.predict()
     should_bet, reason = bankroll.should_bet(next_prediction['confidence'], next_prediction['mode'])
 
+    # Signal gate: skip betting when wheel strategy signal is weak
+    signal_gated = False
+    if should_bet and not next_prediction.get('should_bet', True):
+        signal_gated = True
+        reason = f"SKIP — Signal weak ({next_prediction.get('signal_strength', 0)}/{next_prediction.get('signal_threshold', 0)})"
+
     next_n_preds = len(next_prediction['top_numbers'])
     next_bet_per_number = bankroll.calculate_bet_amount(next_prediction['confidence'], 'straight', num_predictions=next_n_preds)
     next_total_bet = round(next_bet_per_number * next_n_preds, 2)
 
     next_recommended_bet = None
-    if should_bet and next_prediction['top_numbers']:
+    if should_bet and not signal_gated and next_prediction['top_numbers']:
         next_recommended_bet = {
             'type': 'straight',
             'value': str(next_prediction['anchors'][0]) if next_prediction.get('anchors') else str(next_prediction['top_numbers'][0]),
@@ -408,7 +421,8 @@ def handle_submit_spin(data):
             'bet_result': bet_info
         },
         'next_prediction': next_prediction,
-        'should_bet': should_bet,
+        'should_bet': should_bet and not signal_gated,
+        'signal_gated': signal_gated,
         'bet_reason': reason,
         'recommended_bet': next_recommended_bet,
         'bet_amount': next_bet_per_number,
@@ -666,19 +680,6 @@ def handle_import_data(data):
 
     def _do_import():
         try:
-            # Save as independent imported cluster/session (for persistence)
-            from app.session.session_manager import SessionManager
-            import_mgr = SessionManager()
-            import_mgr.create_session()
-            import_mgr.current_session['status'] = 'imported'
-            import_mgr.current_session['stats']['total_spins'] = len(numbers)
-            import_mgr.current_session['spins'] = [
-                {'spin_number': i + 1, 'actual_number': num}
-                for i, num in enumerate(numbers)
-            ]
-            import_mgr.end_session()
-            print("[import_data] Saved cluster")
-
             # INCREMENTAL: Apply new data on top of existing trained models
             # Models are NOT reset - new numbers are fed one by one via update()
             update_result = predictor.update_incremental(numbers)
@@ -687,12 +688,10 @@ def handle_import_data(data):
             # Yield to eventlet to keep heartbeats alive
             eventlet.sleep(0)
 
-            # Save state so next session start uses cache
-            predictor.save_state()
-
             train_result = {'status': 'skipped' if skip_training else 'pending_background'}
 
-            total_clusters = len(session_mgr.get_all_training_clusters())
+            # Fast cluster count — just counts files, no JSON parsing
+            total_clusters = session_mgr.get_cluster_count()
 
             # Send last 10 numbers so UI can display them immediately
             last_10 = list(predictor.spin_history[-10:])
@@ -710,8 +709,26 @@ def handle_import_data(data):
             }, to=sid)
             print("[import_data] Emitted import_complete successfully")
 
+            # ── Deferred disk I/O (UI already unblocked) ──────────────────
+            # Save imported cluster as JSON for persistence across restarts
+            from app.session.session_manager import SessionManager
+            import_mgr = SessionManager()
+            import_mgr.create_session()
+            import_mgr.current_session['status'] = 'imported'
+            import_mgr.current_session['stats']['total_spins'] = len(numbers)
+            import_mgr.current_session['spins'] = [
+                {'spin_number': i + 1, 'actual_number': num}
+                for i, num in enumerate(numbers)
+            ]
+            import_mgr.end_session()
+            print("[import_data] Saved cluster (deferred)")
+
+            # Save model state for fast next session start
+            predictor.save_state()
+
             # Train LSTM in background AFTER emitting import_complete
-            if not skip_training and predictor.lstm.can_train():
+            # Skip if LSTM weight is 0 (disabled in ensemble)
+            if not skip_training and ENSEMBLE_LSTM_WEIGHT > 0 and predictor.lstm.can_train():
                 result = predictor.train_lstm()
                 predictor.save_state()
                 socketio.emit('training_update', result, to=sid)

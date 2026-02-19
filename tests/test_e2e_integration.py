@@ -389,13 +389,13 @@ class TestE2EFlow:
         initial = bankroll.bankroll
 
         # Simulate a loss (payout_amount, not payout)
-        bankroll.process_result(bet_amount=12, won=False, payout_amount=0)
+        bankroll.process_result(bet_amount=TOP_PREDICTIONS_COUNT, won=False, payout_amount=0)
         assert bankroll.bankroll < initial
         assert bankroll.consecutive_losses == 1
         assert bankroll.total_losses == 1
 
         # Simulate a win
-        bankroll.process_result(bet_amount=12, won=True, payout_amount=35)
+        bankroll.process_result(bet_amount=TOP_PREDICTIONS_COUNT, won=True, payout_amount=35)
         assert bankroll.consecutive_losses == 0
         assert bankroll.total_wins == 1
 

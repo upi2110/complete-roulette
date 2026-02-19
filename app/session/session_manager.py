@@ -214,6 +214,15 @@ class SessionManager:
 
         return all_spins
 
+    def get_cluster_count(self):
+        """Fast count of session/cluster files (no JSON parsing)."""
+        if not os.path.exists(SESSIONS_DIR):
+            return 0
+        return sum(
+            1 for f in os.listdir(SESSIONS_DIR)
+            if f.startswith('session_') and f.endswith('.json')
+        )
+
     def get_all_training_clusters(self):
         """Get training data as separate clusters (each session/import = independent cluster).
         Returns list of lists - each inner list is an independent data cluster."""

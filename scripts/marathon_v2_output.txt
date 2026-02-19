@@ -1,0 +1,926 @@
+========================================================================================================================
+MARATHON V2 — 12-hour time-boxed strategy search
+Started: 2026-02-13 22:45:52
+IMPROVEMENT: Strict per-phase time budgets — ALL phases will run
+========================================================================================================================
+
+Loaded 3275 spins from 7 files:
+  data1.txt: 511 spins
+  data2.txt: 507 spins
+  data3.txt: 509 spins
+  data4.txt: 562 spins
+  data5.txt: 439 spins
+  data6 copy.txt: 507 spins
+  data7.txt: 240 spins
+
+========================================================================================================================
+PHASE 1: 2-MODEL PAIRS (5% coarse + 1% finetune)
+Time: 0min elapsed, 720min remaining | Budget: 60min | Tested: 0
+========================================================================================================================
+  freq(98%)+freq_decay(2%) = 33.21% edge=+0.78%
+  freq(80%)+polarity(20%) = 33.96% edge=+1.53%
+  freq(79%)+pol_contra(21%) = 33.46% edge=+1.03%
+  freq(83%)+table(17%) = 33.15% edge=+0.71%
+  freq(57%)+tab_contra(43%) = 33.65% edge=+1.21%
+  freq(22%)+set(78%) = 33.52% edge=+1.09%
+  freq(72%)+hot(28%) = 33.77% edge=+1.34%
+  freq(82%)+cold(18%) = 33.15% edge=+0.71%
+  freq(92%)+sector(8%) = 34.08% edge=+1.65%
+  freq(93%)+neighbor(7%) = 33.3% edge=+0.87%
+  freq(85%)+repeater(15%) = 33.27% edge=+0.84%
+  freq(76%)+gap(24%) = 33.4% edge=+0.96%
+  freq(55%)+markov(45%) = 33.4% edge=+0.96%
+  freq(90%)+markov2(10%) = 33.4% edge=+0.96%
+  freq(97%)+dozen(3%) = 33.21% edge=+0.78%
+  freq(45%)+column(55%) = 33.62% edge=+1.18%
+  freq(76%)+red_black(24%) = 33.58% edge=+1.15%
+  freq(74%)+odd_even(26%) = 33.8% edge=+1.37%
+  freq(81%)+high_low(19%) = 33.49% edge=+1.06%
+  freq(79%)+quadrant(21%) = 33.27% edge=+0.84%
+  freq(5%)+pattern3(95%) = 33.9% edge=+1.46%
+  freq(96%)+velocity(4%) = 33.65% edge=+1.21%
+  freq_decay(17%)+polarity(83%) = 32.8% edge=+0.37%
+  freq_decay(48%)+pol_contra(52%) = 32.61% edge=+0.18%
+  freq_decay(27%)+tab_contra(73%) = 33.11% edge=+0.68%
+  freq_decay(7%)+set(93%) = 32.96% edge=+0.53%
+  freq_decay(90%)+hot(10%) = 32.64% edge=+0.21%
+  freq_decay(5%)+sector(95%) = 33.9% edge=+1.46%
+  freq_decay(57%)+neighbor(43%) = 32.93% edge=+0.49%
+  freq_decay(80%)+repeater(20%) = 32.86% edge=+0.43%
+  freq_decay(26%)+gap(74%) = 33.02% edge=+0.59%
+  freq_decay(5%)+markov(95%) = 32.99% edge=+0.56%
+  freq_decay(5%)+markov2(95%) = 32.77% edge=+0.34%
+  freq_decay(31%)+dozen(69%) = 33.21% edge=+0.78%
+  freq_decay(35%)+column(65%) = 32.9% edge=+0.46%
+  freq_decay(21%)+red_black(79%) = 33.02% edge=+0.59%
+  freq_decay(30%)+odd_even(70%) = 32.49% edge=+0.06%
+  freq_decay(16%)+high_low(84%) = 33.21% edge=+0.78%
+  freq_decay(44%)+quadrant(56%) = 32.96% edge=+0.53%
+  freq_decay(5%)+pattern3(95%) = 33.65% edge=+1.21%
+  freq_decay(85%)+velocity(15%) = 32.86% edge=+0.43%
+  polarity(58%)+table(42%) = 32.58% edge=+0.15%
+  polarity(90%)+tab_contra(10%) = 32.64% edge=+0.21%
+  polarity(95%)+hot(5%) = 33.65% edge=+1.21%
+  polarity(73%)+cold(27%) = 33.36% edge=+0.93%
+  polarity(51%)+sector(49%) = 33.11% edge=+0.68%
+  polarity(77%)+neighbor(23%) = 33.15% edge=+0.71%
+  polarity(98%)+repeater(2%) = 32.99% edge=+0.56%
+  polarity(5%)+gap(95%) = 32.61% edge=+0.18%
+  polarity(86%)+markov(14%) = 33.62% edge=+1.18%
+  polarity(95%)+column(5%) = 32.68% edge=+0.24%
+  polarity(55%)+odd_even(45%) = 32.74% edge=+0.31%
+  polarity(5%)+high_low(95%) = 33.36% edge=+0.93%
+  polarity(95%)+quadrant(5%) = 32.83% edge=+0.40%
+  polarity(5%)+pattern3(95%) = 33.4% edge=+0.96%
+  polarity(44%)+velocity(56%) = 32.71% edge=+0.27%
+  pol_contra(45%)+table(55%) = 32.86% edge=+0.43%
+  pol_contra(85%)+set(15%) = 32.46% edge=+0.02%
+  pol_contra(5%)+hot(95%) = 33.43% edge=+0.99%
+  pol_contra(55%)+sector(45%) = 33.05% edge=+0.62%
+  pol_contra(94%)+neighbor(6%) = 32.71% edge=+0.27%
+  pol_contra(90%)+repeater(10%) = 32.61% edge=+0.18%
+  pol_contra(75%)+gap(25%) = 32.58% edge=+0.15%
+  pol_contra(60%)+markov(40%) = 32.74% edge=+0.31%
+  pol_contra(60%)+column(40%) = 32.93% edge=+0.49%
+  pol_contra(20%)+red_black(80%) = 33.65% edge=+1.21%
+  pol_contra(82%)+odd_even(18%) = 33.49% edge=+1.06%
+  pol_contra(10%)+high_low(90%) = 33.74% edge=+1.31%
+  pol_contra(70%)+quadrant(30%) = 32.86% edge=+0.43%
+  pol_contra(5%)+pattern3(95%) = 33.9% edge=+1.46%
+  pol_contra(83%)+velocity(17%) = 32.8% edge=+0.37%
+  table(5%)+tab_contra(95%) = 32.64% edge=+0.21%
+  table(30%)+set(70%) = 33.24% edge=+0.81%
+  table(95%)+hot(5%) = 32.61% edge=+0.18%
+  table(70%)+cold(30%) = 32.61% edge=+0.18%
+  table(52%)+sector(48%) = 32.74% edge=+0.31%
+  table(25%)+neighbor(75%) = 32.55% edge=+0.12%
+  table(61%)+repeater(39%) = 33.15% edge=+0.71%
+  table(54%)+gap(46%) = 33.3% edge=+0.87%
+  table(5%)+markov(95%) = 33.77% edge=+1.34%
+  table(61%)+column(39%) = 32.52% edge=+0.09%
+  table(82%)+odd_even(18%) = 34.37% edge=+1.93%
+  table(50%)+high_low(50%) = 33.68% edge=+1.25%
+  table(23%)+pattern3(77%) = 33.21% edge=+0.78%
+  table(26%)+velocity(74%) = 32.74% edge=+0.31%
+  tab_contra(10%)+set(90%) = 32.61% edge=+0.18%
+  tab_contra(76%)+hot(24%) = 32.8% edge=+0.37%
+  tab_contra(65%)+cold(35%) = 32.8% edge=+0.37%
+  tab_contra(75%)+sector(25%) = 33.49% edge=+1.06%
+  tab_contra(85%)+neighbor(15%) = 33.15% edge=+0.71%
+  tab_contra(5%)+repeater(95%) = 32.86% edge=+0.43%
+  tab_contra(35%)+gap(65%) = 33.99% edge=+1.56%
+  tab_contra(74%)+markov(26%) = 33.3% edge=+0.87%
+  tab_contra(90%)+dozen(10%) = 32.64% edge=+0.21%
+  tab_contra(85%)+column(15%) = 32.46% edge=+0.02%
+  tab_contra(31%)+red_black(69%) = 33.18% edge=+0.74%
+  tab_contra(41%)+odd_even(59%) = 33.4% edge=+0.96%
+  tab_contra(65%)+high_low(35%) = 34.18% edge=+1.75%
+  tab_contra(78%)+quadrant(22%) = 32.61% edge=+0.18%
+  tab_contra(5%)+pattern3(95%) = 33.83% edge=+1.40%
+  tab_contra(54%)+velocity(46%) = 32.99% edge=+0.56%
+  set(84%)+hot(16%) = 34.12% edge=+1.68%
+  set(69%)+sector(31%) = 34.3% edge=+1.87%
+  set(95%)+neighbor(5%) = 32.93% edge=+0.49%
+  set(55%)+markov(45%) = 32.83% edge=+0.40%
+  set(88%)+red_black(12%) = 32.58% edge=+0.15%
+  set(20%)+odd_even(80%) = 34.24% edge=+1.81%
+  set(22%)+high_low(78%) = 33.83% edge=+1.40%
+  set(96%)+quadrant(4%) = 32.83% edge=+0.40%
+  set(53%)+pattern3(47%) = 33.33% edge=+0.90%
+  set(5%)+velocity(95%) = 32.64% edge=+0.21%
+  hot(37%)+cold(63%) = 33.49% edge=+1.06%
+  hot(30%)+sector(70%) = 33.49% edge=+1.06%
+  hot(24%)+neighbor(76%) = 33.05% edge=+0.62%
+  hot(41%)+gap(59%) = 33.46% edge=+1.03%
+  hot(5%)+markov(95%) = 32.93% edge=+0.49%
+  hot(75%)+markov2(25%) = 33.02% edge=+0.59%
+  hot(31%)+column(69%) = 33.15% edge=+0.71%
+  hot(20%)+red_black(80%) = 32.71% edge=+0.27%
+  hot(21%)+odd_even(79%) = 32.74% edge=+0.31%
+  hot(1%)+high_low(99%) = 33.68% edge=+1.25%
+  hot(32%)+quadrant(68%) = 32.8% edge=+0.37%
+  hot(5%)+pattern3(95%) = 33.11% edge=+0.68%
+  hot(26%)+velocity(74%) = 32.68% edge=+0.24%
+  cold(50%)+sector(50%) = 32.9% edge=+0.46%
+  cold(65%)+repeater(35%) = 32.8% edge=+0.37%
+  cold(5%)+gap(95%) = 32.61% edge=+0.18%
+  cold(95%)+markov(5%) = 33.62% edge=+1.18%
+  cold(5%)+markov2(95%) = 32.71% edge=+0.27%
+  cold(50%)+red_black(50%) = 32.74% edge=+0.31%
+  cold(11%)+odd_even(89%) = 32.74% edge=+0.31%
+  cold(11%)+high_low(89%) = 33.58% edge=+1.15%
+  cold(5%)+pattern3(95%) = 33.52% edge=+1.09%
+  cold(18%)+velocity(82%) = 32.93% edge=+0.49%
+  sector(18%)+neighbor(82%) = 33.02% edge=+0.59%
+  sector(62%)+repeater(38%) = 33.68% edge=+1.25%
+  sector(5%)+gap(95%) = 33.55% edge=+1.12%
+  sector(47%)+markov(53%) = 33.74% edge=+1.31%
+  sector(73%)+markov2(27%) = 33.3% edge=+0.87%
+  sector(53%)+dozen(47%) = 33.11% edge=+0.68%
+  sector(48%)+column(52%) = 33.4% edge=+0.96%
+  sector(43%)+red_black(57%) = 33.11% edge=+0.68%
+  sector(39%)+odd_even(61%) = 33.9% edge=+1.46%
+  sector(48%)+high_low(52%) = 33.52% edge=+1.09%
+  sector(56%)+quadrant(44%) = 33.15% edge=+0.71%
+  sector(45%)+pattern3(55%) = 33.99% edge=+1.56%
+  sector(75%)+velocity(25%) = 33.58% edge=+1.15%
+  neighbor(87%)+repeater(13%) = 32.96% edge=+0.53%
+  neighbor(20%)+gap(80%) = 33.05% edge=+0.62%
+  neighbor(56%)+markov(44%) = 33.27% edge=+0.84%
+  neighbor(93%)+markov2(7%) = 32.46% edge=+0.02%
+  neighbor(68%)+column(32%) = 32.52% edge=+0.09%
+  neighbor(5%)+red_black(95%) = 32.71% edge=+0.27%
+  neighbor(5%)+odd_even(95%) = 33.52% edge=+1.09%
+  neighbor(10%)+high_low(90%) = 32.61% edge=+0.18%
+  neighbor(82%)+quadrant(18%) = 32.55% edge=+0.12%
+  neighbor(15%)+pattern3(85%) = 33.02% edge=+0.59%
+  neighbor(85%)+velocity(15%) = 32.8% edge=+0.37%
+  repeater(5%)+gap(95%) = 32.99% edge=+0.56%
+  repeater(5%)+markov(95%) = 32.58% edge=+0.15%
+  repeater(30%)+column(70%) = 32.71% edge=+0.27%
+  repeater(15%)+red_black(85%) = 32.9% edge=+0.46%
+  repeater(22%)+odd_even(78%) = 33.33% edge=+0.90%
+  repeater(3%)+high_low(97%) = 33.4% edge=+0.96%
+  repeater(60%)+quadrant(40%) = 32.52% edge=+0.09%
+  repeater(9%)+pattern3(91%) = 33.55% edge=+1.12%
+  repeater(5%)+velocity(95%) = 32.74% edge=+0.31%
+  gap(81%)+markov(19%) = 33.49% edge=+1.06%
+  gap(95%)+markov2(5%) = 32.86% edge=+0.43%
+  gap(75%)+dozen(25%) = 33.24% edge=+0.81%
+  gap(75%)+column(25%) = 33.02% edge=+0.59%
+  gap(57%)+red_black(43%) = 32.8% edge=+0.37%
+  gap(7%)+odd_even(93%) = 33.43% edge=+0.99%
+  gap(7%)+high_low(93%) = 33.87% edge=+1.43%
+  gap(81%)+quadrant(19%) = 33.9% edge=+1.46%
+  gap(30%)+pattern3(70%) = 34.18% edge=+1.75%
+  gap(5%)+velocity(95%) = 32.61% edge=+0.18%
+  markov(65%)+markov2(35%) = 32.9% edge=+0.46%
+  markov(59%)+dozen(41%) = 32.71% edge=+0.27%
+  markov(46%)+column(54%) = 33.55% edge=+1.12%
+  markov(7%)+red_black(93%) = 33.15% edge=+0.71%
+  markov(22%)+odd_even(78%) = 33.58% edge=+1.15%
+  markov(1%)+high_low(99%) = 34.18% edge=+1.75%
+  markov(70%)+quadrant(30%) = 33.08% edge=+0.65%
+  markov(30%)+pattern3(70%) = 34.59% edge=+2.15%
+
+  Top 10 pairs:
+    markov(30%)+pattern3(70%) = 34.59% $+2880
+    table(82%)+odd_even(18%) = 34.37% $+2376
+    set(69%)+sector(31%) = 34.3% $+2232
+    set(20%)+odd_even(80%) = 34.24% $+2088
+    tab_contra(65%)+high_low(35%) = 34.18% $+1944
+    gap(30%)+pattern3(70%) = 34.18% $+1944
+    markov(1%)+high_low(99%) = 34.18% $+1944
+    set(84%)+hot(16%) = 34.12% $+1800
+    freq(92%)+sector(8%) = 34.08% $+1728
+    tab_contra(35%)+gap(65%) = 33.99% $+1512
+
+  ==============================================================================================================
+  AFTER PHASE 1 (min 100 bets)
+  ==============================================================================================================
+    # Config                                                                  Bets   Hit%    Edge   Profit  Bet%
+  ---------------------------------------------------------------------------------------------------------
+    1 markov(30%)+pattern3(70%)                                               3195  34.59   +2.15 $  +2880  100%
+    2 markov(30%)+pattern3(70%)                                               3195  34.59   +2.15 $  +2880  100%
+    3 markov(29%)+pattern3(71%)                                               3195  34.52   +2.09 $  +2736  100%
+    4 markov(31%)+pattern3(69%)                                               3195  34.52   +2.09 $  +2736  100%
+    5 markov(34%)+pattern3(66%)                                               3195  34.46   +2.03 $  +2592  100%
+    6 markov(45%)+pattern3(55%)                                               3195  34.43   +2.00 $  +2520  100%
+    7 markov(35%)+pattern3(65%)                                               3195  34.40   +1.97 $  +2448  100%
+    8 table(82%)+odd_even(18%)                                                3195  34.37   +1.93 $  +2376  100%
+    9 table(83%)+odd_even(17%)                                                3195  34.37   +1.93 $  +2376  100%
+   10 markov(33%)+pattern3(67%)                                               3195  34.37   +1.93 $  +2376  100%
+   11 table(85%)+odd_even(15%)                                                3195  34.33   +1.90 $  +2304  100%
+   12 table(85%)+odd_even(15%)                                                3195  34.33   +1.90 $  +2304  100%
+   13 markov(28%)+pattern3(72%)                                               3195  34.33   +1.90 $  +2304  100%
+   14 table(95%)+odd_even(5%)                                                 3195  34.30   +1.87 $  +2232  100%
+   15 table(86%)+odd_even(14%)                                                3195  34.30   +1.87 $  +2232  100%
+
+========================================================================================================================
+PHASE 2: 3-MODEL COMBOS (top 10 models, 10% steps)
+Time: 60min elapsed, 660min remaining | Budget: 90min | Tested: 6048
+========================================================================================================================
+  Top 10 models for 3-model combos: ['table', 'pattern3', 'odd_even', 'set', 'markov', 'high_low', 'tab_contra', 'sector', 'gap']
+  ... 2000 tested, 89min
+
+  ==============================================================================================================
+  AFTER PHASE 2 (min 100 bets)
+  ==============================================================================================================
+    # Config                                                                  Bets   Hit%    Edge   Profit  Bet%
+  ---------------------------------------------------------------------------------------------------------
+    1 set(15)+high_low(70)+tab_contra(15)                                     3195  34.62   +2.18 $  +2952  100%
+    2 set(15)+high_low(70)+tab_contra(15)                                     3195  34.62   +2.18 $  +2952  100%
+    3 markov(30%)+pattern3(70%)                                               3195  34.59   +2.15 $  +2880  100%
+    4 markov(30%)+pattern3(70%)                                               3195  34.59   +2.15 $  +2880  100%
+    5 markov(29%)+pattern3(71%)                                               3195  34.52   +2.09 $  +2736  100%
+    6 markov(31%)+pattern3(69%)                                               3195  34.52   +2.09 $  +2736  100%
+    7 set(10)+high_low(75)+tab_contra(15)                                     3195  34.49   +2.06 $  +2664  100%
+    8 markov(34%)+pattern3(66%)                                               3195  34.46   +2.03 $  +2592  100%
+    9 odd_even(10)+set(60)+sector(30)                                         3195  34.46   +2.03 $  +2592  100%
+   10 odd_even(5)+set(65)+sector(30)                                          3195  34.46   +2.03 $  +2592  100%
+   11 odd_even(10)+set(60)+sector(30)                                         3195  34.46   +2.03 $  +2592  100%
+   12 markov(45%)+pattern3(55%)                                               3195  34.43   +2.00 $  +2520  100%
+   13 set(10)+high_low(70)+tab_contra(20)                                     3195  34.43   +2.00 $  +2520  100%
+   14 odd_even(5)+set(60)+sector(35)                                          3195  34.43   +2.00 $  +2520  100%
+   15 set(10)+high_low(70)+tab_contra(20)                                     3195  34.43   +2.00 $  +2520  100%
+
+========================================================================================================================
+PHASE 3: TOP-N SWEEP (8-16) with top 40 weight combos
+Time: 93min elapsed, 627min remaining | Budget: 30min | Tested: 8503
+========================================================================================================================
+
+  ==============================================================================================================
+  AFTER PHASE 3 (min 50 bets)
+  ==============================================================================================================
+    # Config                                                                  Bets   Hit%    Edge   Profit  Bet%
+  ---------------------------------------------------------------------------------------------------------
+    1 N=16 high_low(60%)+set(30%)+tab_contra(10%)                             3195  45.51   +2.27 $  +2448  100% *
+    2 N=16 high_low(70%)+tab_contra(20%)+set(10%)                             3195  45.32   +2.08 $  +2016  100% *
+    3 N=16 high_low(70%)+tab_contra(20%)+set(10%)                             3195  45.32   +2.08 $  +2016  100% *
+    4 N=16 high_low(70%)+tab_contra(20%)+set(10%)                             3195  45.32   +2.08 $  +2016  100% *
+    5 N=16 high_low(75%)+tab_contra(20%)+set(5%)                              3195  45.32   +2.08 $  +2016  100% *
+    6 N=16 high_low(75%)+tab_contra(15%)+set(10%)                             3195  45.13   +1.89 $  +1584  100% *
+    7 N=16 pattern3(55%)+markov(45%)                                          3195  45.07   +1.83 $  +1440  100% *
+    8 N=16 high_low(55%)+set(25%)+tab_contra(20%)                             3195  45.07   +1.83 $  +1440  100% *
+    9 N=16 high_low(60%)+set(20%)+tab_contra(20%)                             3195  45.04   +1.80 $  +1368  100% *
+   10 N=16 high_low(60%)+set(20%)+tab_contra(20%)                             3195  45.04   +1.80 $  +1368  100% *
+   11 N=16 high_low(65%)+set(20%)+tab_contra(15%)                             3195  45.04   +1.80 $  +1368  100% *
+   12 N=16 high_low(60%)+set(20%)+tab_contra(20%)                             3195  45.04   +1.80 $  +1368  100% *
+   13 N=16 high_low(65%)+set(20%)+tab_contra(15%)                             3195  45.04   +1.80 $  +1368  100% *
+   14 N=16 high_low(65%)+tab_contra(20%)+set(15%)                             3195  45.01   +1.76 $  +1296  100% *
+   15 N=16 high_low(65%)+tab_contra(20%)+set(15%)                             3195  45.01   +1.76 $  +1296  100% *
+   16 N=16 high_low(70%)+set(15%)+tab_contra(15%)                             3195  44.98   +1.73 $  +1224  100% *
+   17 N=16 high_low(70%)+set(15%)+tab_contra(15%)                             3195  44.98   +1.73 $  +1224  100% *
+   18 N=16 set(65%)+sector(30%)+odd_even(5%)                                  3195  44.95   +1.70 $  +1152  100% *
+   19 N=16 set(60%)+sector(30%)+odd_even(10%)                                 3195  44.91   +1.67 $  +1080  100% *
+   20 N=16 set(60%)+sector(30%)+odd_even(10%)                                 3195  44.91   +1.67 $  +1080  100% *
+
+========================================================================================================================
+PHASE 4: TRIGGER STRATEGIES with top weights
+Time: 97min elapsed, 623min remaining | Budget: 30min | Tested: 8823
+========================================================================================================================
+
+  ==============================================================================================================
+  AFTER PHASE 4 (min 30 bets)
+  ==============================================================================================================
+    # Config                                                                  Bets   Hit%    Edge   Profit  Bet%
+  ---------------------------------------------------------------------------------------------------------
+    1 N=16 high_low(60%)+set(30%)+tab_contra(10%)                             3195  45.51   +2.27 $  +2448  100% *
+    2 N=16 high_low(70%)+tab_contra(20%)+set(10%)                             3195  45.32   +2.08 $  +2016  100% *
+    3 N=16 high_low(70%)+tab_contra(20%)+set(10%)                             3195  45.32   +2.08 $  +2016  100% *
+    4 N=16 high_low(70%)+tab_contra(20%)+set(10%)                             3195  45.32   +2.08 $  +2016  100% *
+    5 N=16 high_low(75%)+tab_contra(20%)+set(5%)                              3195  45.32   +2.08 $  +2016  100% *
+    6 N=16 high_low(75%)+tab_contra(15%)+set(10%)                             3195  45.13   +1.89 $  +1584  100% *
+    7 N=16 pattern3(55%)+markov(45%)                                          3195  45.07   +1.83 $  +1440  100% *
+    8 N=16 high_low(55%)+set(25%)+tab_contra(20%)                             3195  45.07   +1.83 $  +1440  100% *
+    9 N=16 high_low(60%)+set(20%)+tab_contra(20%)                             3195  45.04   +1.80 $  +1368  100% *
+   10 N=16 high_low(60%)+set(20%)+tab_contra(20%)                             3195  45.04   +1.80 $  +1368  100% *
+   11 N=16 high_low(65%)+set(20%)+tab_contra(15%)                             3195  45.04   +1.80 $  +1368  100% *
+   12 N=16 high_low(60%)+set(20%)+tab_contra(20%)                             3195  45.04   +1.80 $  +1368  100% *
+   13 N=16 high_low(65%)+set(20%)+tab_contra(15%)                             3195  45.04   +1.80 $  +1368  100% *
+   14 N=16 high_low(65%)+tab_contra(20%)+set(15%)                             3195  45.01   +1.76 $  +1296  100% *
+   15 N=16 high_low(65%)+tab_contra(20%)+set(15%)                             3195  45.01   +1.76 $  +1296  100% *
+   16 N=16 high_low(70%)+set(15%)+tab_contra(15%)                             3195  44.98   +1.73 $  +1224  100% *
+   17 N=16 high_low(70%)+set(15%)+tab_contra(15%)                             3195  44.98   +1.73 $  +1224  100% *
+   18 N=16 set(65%)+sector(30%)+odd_even(5%)                                  3195  44.95   +1.70 $  +1152  100% *
+   19 N=16 set(60%)+sector(30%)+odd_even(10%)                                 3195  44.91   +1.67 $  +1080  100% *
+   20 N=16 set(60%)+sector(30%)+odd_even(10%)                                 3195  44.91   +1.67 $  +1080  100% *
+
+========================================================================================================================
+PHASE 5: SIGNAL GATE SWEEP
+Time: 98min elapsed, 622min remaining | Budget: 45min | Tested: 9423
+========================================================================================================================
+
+  ==============================================================================================================
+  AFTER PHASE 5 (min 30 bets)
+  ==============================================================================================================
+    # Config                                                                  Bets   Hit%    Edge   Profit  Bet%
+  ---------------------------------------------------------------------------------------------------------
+    1 N=14 pattern3(55%)+markov(45%)|tab>=35                                    49  51.02  +13.18 $   +428    2% *
+    2 N=14 pattern3(66%)+markov(34%)|tab>=35                                    49  51.02  +13.18 $   +428    2% *
+    3 N=14 pattern3(67%)+markov(33%)|tab>=35                                    49  48.98  +11.14 $   +356    2% *
+    4 N=14 set(65%)+sector(30%)+odd_even(5%)|tab>=25                           234  47.86  +10.03 $  +1512    7% *
+    5 N=14 set(60%)+sector(30%)+odd_even(10%)|tab>=25                          234  47.86  +10.03 $  +1512    7% *
+    6 N=14 set(60%)+sector(30%)+odd_even(10%)|tab>=25                          234  47.86  +10.03 $  +1512    7% *
+    7 N=14 set(50%)+sector(45%)+odd_even(5%)|tab>=25                           234  47.86  +10.03 $  +1512    7% *
+    8 N=14 set(55%)+sector(40%)+odd_even(5%)|tab>=25                           234  47.86  +10.03 $  +1512    7% *
+    9 N=14 set(60%)+sector(35%)+odd_even(5%)|tab>=25                           234  47.44   +9.60 $  +1440    7% *
+   10 N=13 pattern3(55%)+markov(45%)|tab>=35                                    49  46.94  +11.80 $   +382    2% *
+   11 N=13 pattern3(66%)+markov(34%)|tab>=35                                    49  46.94  +11.80 $   +382    2% *
+   12 N=13 pattern3(67%)+markov(33%)|tab>=35                                    49  46.94  +11.80 $   +382    2% *
+   13 N=14 set(60%)+sector(35%)+odd_even(5%)|tab>=30                           127  46.46   +8.62 $   +692    4% *
+   14 N=14 pattern3(66%)+markov(34%)|tab>=30                                   127  46.46   +8.62 $   +692    4% *
+   15 N=14 set(50%)+sector(45%)+odd_even(5%)|tab>=30                           127  46.46   +8.62 $   +692    4% *
+   16 N=14 set(55%)+sector(40%)+odd_even(5%)|tab>=30                           127  46.46   +8.62 $   +692    4% *
+   17 N=13 set(65%)+sector(30%)+odd_even(5%)|tab>=25                           234  46.15  +11.02 $  +1692    7% *
+   18 N=13 set(60%)+sector(30%)+odd_even(10%)|tab>=25                          234  46.15  +11.02 $  +1692    7% *
+   19 N=13 set(60%)+sector(30%)+odd_even(10%)|tab>=25                          234  46.15  +11.02 $  +1692    7% *
+   20 N=14 set(65%)+sector(30%)+odd_even(5%)|tab>=30                           127  45.67   +7.83 $   +620    4% *
+
+========================================================================================================================
+PHASE 6: GATE + TRIGGER HYBRIDS
+Time: 107min elapsed, 613min remaining | Budget: 45min | Tested: 12723
+========================================================================================================================
+
+  ==============================================================================================================
+  AFTER PHASE 6 (min 20 bets)
+  ==============================================================================================================
+    # Config                                                                  Bets   Hit%    Edge   Profit  Bet%
+  ---------------------------------------------------------------------------------------------------------
+    1 N=14 pattern3(55%)+markov(45%)|tab>=35                                    49  51.02  +13.18 $   +428    2% *
+    2 N=14 pattern3(66%)+markov(34%)|tab>=35                                    49  51.02  +13.18 $   +428    2% *
+    3 N=14 pattern3(67%)+markov(33%)|tab>=35                                    49  48.98  +11.14 $   +356    2% *
+    4 N=13 set(50%)+sector(45%)+odd_even(5%)|alternating|pol>=25                94  48.94  +13.80 $   +868    3% *
+    5 N=14 set(50%)+sector(45%)+odd_even(5%)|alternating|pol>=25                94  48.94  +11.10 $   +680    3% *
+    6 N=13 set(55%)+sector(40%)+odd_even(5%)|alternating|pol>=25                94  48.94  +13.80 $   +868    3% *
+    7 N=14 set(55%)+sector(40%)+odd_even(5%)|alternating|pol>=25                94  48.94  +11.10 $   +680    3% *
+    8 N=13 set(60%)+sector(35%)+odd_even(5%)|alternating|pol>=25                94  48.94  +13.80 $   +868    3% *
+    9 N=14 set(60%)+sector(35%)+odd_even(5%)|alternating|pol>=25                94  48.94  +11.10 $   +680    3% *
+   10 N=13 set(60%)+sector(35%)+odd_even(5%)|alternating|pol>=25                94  48.94  +13.80 $   +868    3% *
+   11 N=14 set(60%)+sector(35%)+odd_even(5%)|alternating|pol>=25                94  48.94  +11.10 $   +680    3% *
+   12 N=13 set(50%)+sector(45%)+odd_even(5%)|alternating|pol>=25                94  48.94  +13.80 $   +868    3% *
+   13 N=14 set(50%)+sector(45%)+odd_even(5%)|alternating|pol>=25                94  48.94  +11.10 $   +680    3% *
+   14 N=13 set(65%)+sector(30%)+odd_even(5%)|alternating|pol>=25                94  47.87  +12.74 $   +796    3% *
+   15 N=14 set(65%)+sector(30%)+odd_even(5%)|alternating|pol>=25                94  47.87  +10.03 $   +608    3% *
+   16 N=13 set(60%)+sector(30%)+odd_even(10%)|alternating|pol>=25               94  47.87  +12.74 $   +796    3% *
+   17 N=14 set(60%)+sector(30%)+odd_even(10%)|alternating|pol>=25               94  47.87  +10.03 $   +608    3% *
+   18 N=13 set(60%)+sector(30%)+odd_even(10%)|alternating|pol>=25               94  47.87  +12.74 $   +796    3% *
+   19 N=14 set(60%)+sector(30%)+odd_even(10%)|alternating|pol>=25               94  47.87  +10.03 $   +608    3% *
+   20 N=14 set(65%)+sector(30%)+odd_even(5%)|tab>=25                           234  47.86  +10.03 $  +1512    7% *
+
+========================================================================================================================
+PHASE 7: STREAK-BASED FILTERS
+Time: 126min elapsed, 594min remaining | Budget: 30min | Tested: 19923
+========================================================================================================================
+
+  ==============================================================================================================
+  AFTER PHASE 7 (min 20 bets)
+  ==============================================================================================================
+    # Config                                                                  Bets   Hit%    Edge   Profit  Bet%
+  ---------------------------------------------------------------------------------------------------------
+    1 N=14 pattern3(55%)+markov(45%)|tab>=35                                    49  51.02  +13.18 $   +428    2% *
+    2 N=14 pattern3(66%)+markov(34%)|tab>=35                                    49  51.02  +13.18 $   +428    2% *
+    3 N=14 pattern3(67%)+markov(33%)|tab>=35                                    49  48.98  +11.14 $   +356    2% *
+    4 N=13 set(50%)+sector(45%)+odd_even(5%)|alternating|pol>=25                94  48.94  +13.80 $   +868    3% *
+    5 N=14 set(50%)+sector(45%)+odd_even(5%)|alternating|pol>=25                94  48.94  +11.10 $   +680    3% *
+    6 N=13 set(55%)+sector(40%)+odd_even(5%)|alternating|pol>=25                94  48.94  +13.80 $   +868    3% *
+    7 N=14 set(55%)+sector(40%)+odd_even(5%)|alternating|pol>=25                94  48.94  +11.10 $   +680    3% *
+    8 N=13 set(60%)+sector(35%)+odd_even(5%)|alternating|pol>=25                94  48.94  +13.80 $   +868    3% *
+    9 N=14 set(60%)+sector(35%)+odd_even(5%)|alternating|pol>=25                94  48.94  +11.10 $   +680    3% *
+   10 N=13 set(60%)+sector(35%)+odd_even(5%)|alternating|pol>=25                94  48.94  +13.80 $   +868    3% *
+   11 N=14 set(60%)+sector(35%)+odd_even(5%)|alternating|pol>=25                94  48.94  +11.10 $   +680    3% *
+   12 N=13 set(50%)+sector(45%)+odd_even(5%)|alternating|pol>=25                94  48.94  +13.80 $   +868    3% *
+   13 N=14 set(50%)+sector(45%)+odd_even(5%)|alternating|pol>=25                94  48.94  +11.10 $   +680    3% *
+   14 N=12 pattern3(55%)+markov(45%)|skip_win_3                                 33  48.48  +16.05 $   +360    1% *
+   15 N=13 pattern3(55%)+markov(45%)|skip_win_3                                 33  48.48  +13.35 $   +294    1% *
+   16 N=12 pattern3(66%)+markov(34%)|skip_win_3                                 33  48.48  +16.05 $   +360    1% *
+   17 N=13 pattern3(66%)+markov(34%)|skip_win_3                                 33  48.48  +13.35 $   +294    1% *
+   18 N=12 pattern3(67%)+markov(33%)|skip_win_3                                 33  48.48  +16.05 $   +360    1% *
+   19 N=13 pattern3(67%)+markov(33%)|skip_win_3                                 33  48.48  +13.35 $   +294    1% *
+   20 N=13 set(65%)+sector(30%)+odd_even(5%)|alternating|pol>=25                94  47.87  +12.74 $   +796    3% *
+
+========================================================================================================================
+PHASE 8: 4-MODEL COMBOS (top 8 models, 10% steps)
+Time: 127min elapsed, 593min remaining | Budget: 60min | Tested: 21813
+========================================================================================================================
+  Using top 8 models: ['table', 'pattern3', 'odd_even', 'set', 'markov', 'high_low', 'tab_contra', 'sector']
+
+  ==============================================================================================================
+  AFTER PHASE 8 (min 50 bets)
+  ==============================================================================================================
+    # Config                                                                  Bets   Hit%    Edge   Profit  Bet%
+  ---------------------------------------------------------------------------------------------------------
+    1 N=13 set(50%)+sector(45%)+odd_even(5%)|alternating|pol>=25                94  48.94  +13.80 $   +868    3% *
+    2 N=14 set(50%)+sector(45%)+odd_even(5%)|alternating|pol>=25                94  48.94  +11.10 $   +680    3% *
+    3 N=13 set(55%)+sector(40%)+odd_even(5%)|alternating|pol>=25                94  48.94  +13.80 $   +868    3% *
+    4 N=14 set(55%)+sector(40%)+odd_even(5%)|alternating|pol>=25                94  48.94  +11.10 $   +680    3% *
+    5 N=13 set(60%)+sector(35%)+odd_even(5%)|alternating|pol>=25                94  48.94  +13.80 $   +868    3% *
+    6 N=14 set(60%)+sector(35%)+odd_even(5%)|alternating|pol>=25                94  48.94  +11.10 $   +680    3% *
+    7 N=13 set(60%)+sector(35%)+odd_even(5%)|alternating|pol>=25                94  48.94  +13.80 $   +868    3% *
+    8 N=14 set(60%)+sector(35%)+odd_even(5%)|alternating|pol>=25                94  48.94  +11.10 $   +680    3% *
+    9 N=13 set(50%)+sector(45%)+odd_even(5%)|alternating|pol>=25                94  48.94  +13.80 $   +868    3% *
+   10 N=14 set(50%)+sector(45%)+odd_even(5%)|alternating|pol>=25                94  48.94  +11.10 $   +680    3% *
+   11 N=13 set(65%)+sector(30%)+odd_even(5%)|alternating|pol>=25                94  47.87  +12.74 $   +796    3% *
+   12 N=14 set(65%)+sector(30%)+odd_even(5%)|alternating|pol>=25                94  47.87  +10.03 $   +608    3% *
+   13 N=13 set(60%)+sector(30%)+odd_even(10%)|alternating|pol>=25               94  47.87  +12.74 $   +796    3% *
+   14 N=14 set(60%)+sector(30%)+odd_even(10%)|alternating|pol>=25               94  47.87  +10.03 $   +608    3% *
+   15 N=13 set(60%)+sector(30%)+odd_even(10%)|alternating|pol>=25               94  47.87  +12.74 $   +796    3% *
+   16 N=14 set(60%)+sector(30%)+odd_even(10%)|alternating|pol>=25               94  47.87  +10.03 $   +608    3% *
+   17 N=14 set(65%)+sector(30%)+odd_even(5%)|tab>=25                           234  47.86  +10.03 $  +1512    7% *
+   18 N=14 set(60%)+sector(30%)+odd_even(10%)|tab>=25                          234  47.86  +10.03 $  +1512    7% *
+   19 N=14 set(60%)+sector(30%)+odd_even(10%)|tab>=25                          234  47.86  +10.03 $  +1512    7% *
+   20 N=14 set(50%)+sector(45%)+odd_even(5%)|tab>=25                           234  47.86  +10.03 $  +1512    7% *
+
+========================================================================================================================
+PHASE 9: WINDOW SWEEP — different warmup/history sizes
+Time: 172min elapsed, 548min remaining | Budget: 30min | Tested: 24263
+========================================================================================================================
+  warmup=40 pattern3(55%)+markov(45%) = 42.7%
+  warmup=40 pattern3(66%)+markov(34%) = 41.57%
+  warmup=40 pattern3(67%)+markov(33%) = 40.45%
+  warmup=40 set(50%)+sector(45%)+odd_even(5%) = 41.51%
+  warmup=40 set(50%)+sector(45%)+odd_even(5%) = 41.51%
+  warmup=40 set(55%)+sector(40%)+odd_even(5%) = 41.51%
+  warmup=40 set(55%)+sector(40%)+odd_even(5%) = 41.51%
+  warmup=40 set(60%)+sector(35%)+odd_even(5%) = 41.51%
+  warmup=40 set(60%)+sector(35%)+odd_even(5%) = 41.51%
+  warmup=40 set(60%)+sector(35%)+odd_even(5%) = 41.51%
+  warmup=40 set(60%)+sector(35%)+odd_even(5%) = 41.51%
+  warmup=40 set(50%)+sector(45%)+odd_even(5%) = 41.51%
+  warmup=40 set(50%)+sector(45%)+odd_even(5%) = 41.51%
+  warmup=40 pattern3(55%)+markov(45%) = 34.5%
+  warmup=40 pattern3(55%)+markov(45%) = 37.19%
+  warmup=60 pattern3(55%)+markov(45%) = 42.7%
+  warmup=60 pattern3(66%)+markov(34%) = 41.57%
+  warmup=60 pattern3(67%)+markov(33%) = 40.45%
+  warmup=60 set(50%)+sector(45%)+odd_even(5%) = 42.31%
+  warmup=60 set(50%)+sector(45%)+odd_even(5%) = 42.31%
+  warmup=60 set(55%)+sector(40%)+odd_even(5%) = 42.31%
+  warmup=60 set(55%)+sector(40%)+odd_even(5%) = 42.31%
+  warmup=60 set(60%)+sector(35%)+odd_even(5%) = 42.31%
+  warmup=60 set(60%)+sector(35%)+odd_even(5%) = 42.31%
+  warmup=60 set(60%)+sector(35%)+odd_even(5%) = 42.31%
+  warmup=60 set(60%)+sector(35%)+odd_even(5%) = 42.31%
+  warmup=60 set(50%)+sector(45%)+odd_even(5%) = 42.31%
+  warmup=60 set(50%)+sector(45%)+odd_even(5%) = 42.31%
+  warmup=60 pattern3(55%)+markov(45%) = 34.49%
+  warmup=60 pattern3(55%)+markov(45%) = 37.2%
+  warmup=100 pattern3(55%)+markov(45%) = 42.7%
+  warmup=100 pattern3(66%)+markov(34%) = 41.57%
+  warmup=100 pattern3(67%)+markov(33%) = 40.45%
+  warmup=100 set(50%)+sector(45%)+odd_even(5%) = 42.31%
+  warmup=100 set(50%)+sector(45%)+odd_even(5%) = 42.31%
+  warmup=100 set(55%)+sector(40%)+odd_even(5%) = 42.31%
+  warmup=100 set(55%)+sector(40%)+odd_even(5%) = 42.31%
+  warmup=100 set(60%)+sector(35%)+odd_even(5%) = 42.31%
+  warmup=100 set(60%)+sector(35%)+odd_even(5%) = 42.31%
+  warmup=100 set(60%)+sector(35%)+odd_even(5%) = 42.31%
+  warmup=100 set(60%)+sector(35%)+odd_even(5%) = 42.31%
+  warmup=100 set(50%)+sector(45%)+odd_even(5%) = 42.31%
+  warmup=100 set(50%)+sector(45%)+odd_even(5%) = 42.31%
+  warmup=100 pattern3(55%)+markov(45%) = 34.39%
+  warmup=100 pattern3(55%)+markov(45%) = 37.13%
+  warmup=120 pattern3(55%)+markov(45%) = 42.7%
+  warmup=120 pattern3(66%)+markov(34%) = 41.57%
+  warmup=120 pattern3(67%)+markov(33%) = 40.45%
+  warmup=120 set(50%)+sector(45%)+odd_even(5%) = 41.75%
+  warmup=120 set(50%)+sector(45%)+odd_even(5%) = 41.75%
+  warmup=120 set(55%)+sector(40%)+odd_even(5%) = 41.75%
+  warmup=120 set(55%)+sector(40%)+odd_even(5%) = 41.75%
+  warmup=120 set(60%)+sector(35%)+odd_even(5%) = 41.75%
+  warmup=120 set(60%)+sector(35%)+odd_even(5%) = 41.75%
+  warmup=120 set(60%)+sector(35%)+odd_even(5%) = 41.75%
+  warmup=120 set(60%)+sector(35%)+odd_even(5%) = 41.75%
+  warmup=120 set(50%)+sector(45%)+odd_even(5%) = 41.75%
+  warmup=120 set(50%)+sector(45%)+odd_even(5%) = 41.75%
+  warmup=120 pattern3(55%)+markov(45%) = 34.33%
+  warmup=120 pattern3(55%)+markov(45%) = 37.05%
+  warmup=150 pattern3(55%)+markov(45%) = 42.7%
+  warmup=150 pattern3(66%)+markov(34%) = 41.57%
+  warmup=150 pattern3(67%)+markov(33%) = 40.45%
+  warmup=150 set(50%)+sector(45%)+odd_even(5%) = 41.95%
+  warmup=150 set(50%)+sector(45%)+odd_even(5%) = 41.95%
+  warmup=150 set(55%)+sector(40%)+odd_even(5%) = 41.95%
+  warmup=150 set(55%)+sector(40%)+odd_even(5%) = 41.95%
+  warmup=150 set(60%)+sector(35%)+odd_even(5%) = 41.95%
+  warmup=150 set(60%)+sector(35%)+odd_even(5%) = 41.95%
+  warmup=150 set(60%)+sector(35%)+odd_even(5%) = 41.95%
+  warmup=150 set(60%)+sector(35%)+odd_even(5%) = 41.95%
+  warmup=150 set(50%)+sector(45%)+odd_even(5%) = 41.95%
+  warmup=150 set(50%)+sector(45%)+odd_even(5%) = 41.95%
+  warmup=150 pattern3(55%)+markov(45%) = 34.34%
+  warmup=150 pattern3(55%)+markov(45%) = 37.02%
+
+  ==============================================================================================================
+  AFTER PHASE 9 (min 100 bets)
+  ==============================================================================================================
+    # Config                                                                  Bets   Hit%    Edge   Profit  Bet%
+  ---------------------------------------------------------------------------------------------------------
+    1 N=14 set(65%)+sector(30%)+odd_even(5%)|tab>=25                           234  47.86  +10.03 $  +1512    7% *
+    2 N=14 set(60%)+sector(30%)+odd_even(10%)|tab>=25                          234  47.86  +10.03 $  +1512    7% *
+    3 N=14 set(60%)+sector(30%)+odd_even(10%)|tab>=25                          234  47.86  +10.03 $  +1512    7% *
+    4 N=14 set(50%)+sector(45%)+odd_even(5%)|tab>=25                           234  47.86  +10.03 $  +1512    7% *
+    5 N=14 set(55%)+sector(40%)+odd_even(5%)|tab>=25                           234  47.86  +10.03 $  +1512    7% *
+    6 N=14 set(60%)+sector(35%)+odd_even(5%)|tab>=25                           234  47.44   +9.60 $  +1440    7% *
+    7 N=14 pattern3(55%)+markov(45%)|table_double_oppose|tab>=25               120  46.67   +8.83 $   +672    4% *
+    8 N=14 pattern3(55%)+markov(45%)|table_double_oppose|tab>=25               120  46.67   +8.83 $   +672    4% *
+    9 N=14 set(60%)+sector(35%)+odd_even(5%)|tab>=30                           127  46.46   +8.62 $   +692    4% *
+   10 N=14 pattern3(66%)+markov(34%)|tab>=30                                   127  46.46   +8.62 $   +692    4% *
+   11 N=14 set(50%)+sector(45%)+odd_even(5%)|tab>=30                           127  46.46   +8.62 $   +692    4% *
+   12 N=14 set(55%)+sector(40%)+odd_even(5%)|tab>=30                           127  46.46   +8.62 $   +692    4% *
+   13 N=13 set(65%)+sector(30%)+odd_even(5%)|tab>=25                           234  46.15  +11.02 $  +1692    7% *
+   14 N=13 set(60%)+sector(30%)+odd_even(10%)|tab>=25                          234  46.15  +11.02 $  +1692    7% *
+   15 N=13 set(60%)+sector(30%)+odd_even(10%)|tab>=25                          234  46.15  +11.02 $  +1692    7% *
+
+========================================================================================================================
+PHASE 10: MEGA COMBOS — combine top configs with gates + triggers + N + streaks
+Time: 172min elapsed, 548min remaining | Budget: 30min | Tested: 24338
+========================================================================================================================
+
+  ==============================================================================================================
+  AFTER PHASE 10 — MEGA COMBOS (min 20 bets)
+  ==============================================================================================================
+    # Config                                                                  Bets   Hit%    Edge   Profit  Bet%
+  ---------------------------------------------------------------------------------------------------------
+    1 N=14 pattern3(55%)+markov(45%)|tab>=35                                    49  51.02  +13.18 $   +428    2% *
+    2 N=14 pattern3(66%)+markov(34%)|tab>=35                                    49  51.02  +13.18 $   +428    2% *
+    3 N=14 pattern3(67%)+markov(33%)|tab>=35                                    49  48.98  +11.14 $   +356    2% *
+    4 N=13 set(50%)+sector(45%)+odd_even(5%)|alternating|pol>=25                94  48.94  +13.80 $   +868    3% *
+    5 N=14 set(50%)+sector(45%)+odd_even(5%)|alternating|pol>=25                94  48.94  +11.10 $   +680    3% *
+    6 N=13 set(55%)+sector(40%)+odd_even(5%)|alternating|pol>=25                94  48.94  +13.80 $   +868    3% *
+    7 N=14 set(55%)+sector(40%)+odd_even(5%)|alternating|pol>=25                94  48.94  +11.10 $   +680    3% *
+    8 N=13 set(60%)+sector(35%)+odd_even(5%)|alternating|pol>=25                94  48.94  +13.80 $   +868    3% *
+    9 N=14 set(60%)+sector(35%)+odd_even(5%)|alternating|pol>=25                94  48.94  +11.10 $   +680    3% *
+   10 N=13 set(60%)+sector(35%)+odd_even(5%)|alternating|pol>=25                94  48.94  +13.80 $   +868    3% *
+   11 N=14 set(60%)+sector(35%)+odd_even(5%)|alternating|pol>=25                94  48.94  +11.10 $   +680    3% *
+   12 N=13 set(50%)+sector(45%)+odd_even(5%)|alternating|pol>=25                94  48.94  +13.80 $   +868    3% *
+   13 N=14 set(50%)+sector(45%)+odd_even(5%)|alternating|pol>=25                94  48.94  +11.10 $   +680    3% *
+   14 N=13 set(50%)+sector(45%)+odd_even(5%)|alternating|pol>=25                94  48.94  +13.80 $   +868    3% *
+   15 N=14 set(50%)+sector(45%)+odd_even(5%)|alternating|pol>=25                94  48.94  +11.10 $   +680    3% *
+   16 N=13 set(55%)+sector(40%)+odd_even(5%)|alternating|pol>=25                94  48.94  +13.80 $   +868    3% *
+   17 N=14 set(55%)+sector(40%)+odd_even(5%)|alternating|pol>=25                94  48.94  +11.10 $   +680    3% *
+   18 N=13 set(60%)+sector(35%)+odd_even(5%)|alternating|pol>=25                94  48.94  +13.80 $   +868    3% *
+   19 N=14 set(60%)+sector(35%)+odd_even(5%)|alternating|pol>=25                94  48.94  +11.10 $   +680    3% *
+   20 N=12 pattern3(55%)+markov(45%)|skip_win_3                                 33  48.48  +16.05 $   +360    1% *
+   21 N=13 pattern3(55%)+markov(45%)|skip_win_3                                 33  48.48  +13.35 $   +294    1% *
+   22 N=12 pattern3(66%)+markov(34%)|skip_win_3                                 33  48.48  +16.05 $   +360    1% *
+   23 N=13 pattern3(66%)+markov(34%)|skip_win_3                                 33  48.48  +13.35 $   +294    1% *
+   24 N=12 pattern3(67%)+markov(33%)|skip_win_3                                 33  48.48  +16.05 $   +360    1% *
+   25 N=13 pattern3(67%)+markov(33%)|skip_win_3                                 33  48.48  +13.35 $   +294    1% *
+
+========================================================================================================================
+PHASE 11: RANDOM PERTURBATIONS of top configs
+Time: 186min elapsed, 534min remaining | Budget: 504min | Tested: 38108
+========================================================================================================================
+  ... 1000 perturbations, 195min
+  ... 2000 perturbations, 204min
+  ... 3000 perturbations, 213min
+  ... 4000 perturbations, 222min
+  ... 5000 perturbations, 232min
+  ... 6000 perturbations, 241min
+  ... 7000 perturbations, 251min
+  ... 8000 perturbations, 260min
+  ... 9000 perturbations, 269min
+  ... 10000 perturbations, 279min
+  ... 11000 perturbations, 288min
+  ... 12000 perturbations, 298min
+  ... 13000 perturbations, 308min
+  ... 14000 perturbations, 317min
+  ... 15000 perturbations, 326min
+  ... 16000 perturbations, 333min
+  ... 17000 perturbations, 341min
+  ... 18000 perturbations, 349min
+  ... 19000 perturbations, 357min
+  ... 20000 perturbations, 365min
+  ... 21000 perturbations, 372min
+  ... 22000 perturbations, 380min
+  ... 23000 perturbations, 389min
+  ... 24000 perturbations, 396min
+  ... 25000 perturbations, 402min
+  ... 26000 perturbations, 408min
+  ... 27000 perturbations, 414min
+  ... 28000 perturbations, 421min
+  ... 29000 perturbations, 428min
+  ... 30000 perturbations, 434min
+  ... 31000 perturbations, 439min
+  ... 32000 perturbations, 444min
+  ... 33000 perturbations, 449min
+  ... 34000 perturbations, 453min
+  ... 35000 perturbations, 458min
+  ... 36000 perturbations, 463min
+  ... 37000 perturbations, 468min
+  ... 38000 perturbations, 473min
+  ... 39000 perturbations, 478min
+  ... 40000 perturbations, 482min
+  ... 41000 perturbations, 487min
+  ... 42000 perturbations, 492min
+  ... 43000 perturbations, 497min
+  ... 44000 perturbations, 501min
+  ... 45000 perturbations, 507min
+  ... 46000 perturbations, 512min
+  ... 47000 perturbations, 517min
+  ... 48000 perturbations, 522min
+  ... 49000 perturbations, 527min
+  ... 50000 perturbations, 532min
+  ... 51000 perturbations, 537min
+  ... 52000 perturbations, 542min
+  ... 53000 perturbations, 547min
+  ... 54000 perturbations, 552min
+  ... 55000 perturbations, 557min
+  ... 56000 perturbations, 562min
+  ... 57000 perturbations, 567min
+  ... 58000 perturbations, 572min
+  ... 59000 perturbations, 577min
+  ... 60000 perturbations, 582min
+  ... 61000 perturbations, 587min
+  ... 62000 perturbations, 591min
+  ... 63000 perturbations, 596min
+  ... 64000 perturbations, 601min
+  ... 65000 perturbations, 606min
+  ... 66000 perturbations, 611min
+  ... 67000 perturbations, 617min
+  ... 68000 perturbations, 621min
+  ... 69000 perturbations, 627min
+  ... 70000 perturbations, 633min
+  ... 71000 perturbations, 638min
+  ... 72000 perturbations, 643min
+  ... 73000 perturbations, 648min
+  ... 74000 perturbations, 653min
+  ... 75000 perturbations, 659min
+  ... 76000 perturbations, 664min
+  ... 77000 perturbations, 669min
+  ... 78000 perturbations, 675min
+  ... 79000 perturbations, 679min
+  ... 80000 perturbations, 684min
+  ... 81000 perturbations, 689min
+  Total perturbations: 81225
+
+  ==============================================================================================================
+  AFTER PHASE 11 (min 50 bets)
+  ==============================================================================================================
+    # Config                                                                  Bets   Hit%    Edge   Profit  Bet%
+  ---------------------------------------------------------------------------------------------------------
+    1 N=14 PERT set(66%)+sector(33%)                                            94  51.06  +13.23 $   +824    3% *
+    2 N=14 PERT set(56%)+sector(43%)                                            94  51.06  +13.23 $   +824    3% *
+    3 N=14 PERT set(59%)+sector(40%)                                            94  51.06  +13.23 $   +824    3% *
+    4 N=14 PERT set(53%)+sector(46%)                                            94  51.06  +13.23 $   +824    3% *
+    5 N=14 PERT set(37%)+sector(29%)+red_black(24%)+odd_even(9%)               234  50.43  +12.59 $  +1944    7% *
+    6 N=13 PERT set(61%)+sector(38%)                                            94  50.00  +14.86 $   +940    3% *
+    7 N=13 PERT set(58%)+sector(41%)                                            94  50.00  +14.86 $   +940    3% *
+    8 N=13 PERT set(51%)+polarity(24%)+sector(24%)                              94  50.00  +14.86 $   +940    3% *
+    9 N=13 PERT set(58%)+sector(41%)                                            94  50.00  +14.86 $   +940    3% *
+   10 N=13 PERT set(54%)+sector(45%)                                            94  50.00  +14.86 $   +940    3% *
+   11 N=14 PERT sector(39%)+set(31%)+red_black(15%)+odd_even(14%)              234  50.00  +12.16 $  +1872    7% *
+   12 N=14 PERT set(34%)+sector(29%)+red_black(23%)+odd_even(12%)              234  50.00  +12.16 $  +1872    7% *
+   13 N=14 PERT set(48%)+sector(37%)+red_black(8%)+odd_even(5%)                234  50.00  +12.16 $  +1872    7% *
+   14 N=14 PERT set(34%)+sector(32%)+odd_even(16%)+red_black(15%)              234  50.00  +12.16 $  +1872    7% *
+   15 N=13 PERT set(64%)+sector(35%)                                            94  50.00  +14.86 $   +940    3% *
+   16 N=14 PERT set(50%)+sector(29%)+odd_even(11%)+velocity(8%)                234  49.57  +11.73 $  +1800    7% *
+   17 N=14 PERT set(46%)+sector(26%)+red_black(17%)+odd_even(9%)               234  49.57  +11.73 $  +1800    7% *
+   18 N=14 PERT red_black(31%)+sector(27%)+set(21%)+odd_even(20%)              234  49.57  +11.73 $  +1800    7% *
+   19 N=14 PERT sector(30%)+set(26%)+red_black(18%)+high_low(18%)+odd_even(5%)   234  49.57  +11.73 $  +1800    7% *
+   20 N=14 PERT set(47%)+sector(31%)+red_black(12%)+odd_even(7%)               234  49.57  +11.73 $  +1800    7% *
+
+========================================================================================================================
+PHASE 12: NEW DATA: 3781 spins (was 3275)
+Time: 690min elapsed, 30min remaining | Budget: 15min | Tested: 119333
+========================================================================================================================
+  Re-testing top 30 configs on new data...
+
+  ==============================================================================================================
+  AFTER NEW DATA RETEST (min 100 bets)
+  ==============================================================================================================
+    # Config                                                                  Bets   Hit%    Edge   Profit  Bet%
+  ---------------------------------------------------------------------------------------------------------
+    1 N=14 PERT set(37%)+sector(29%)+red_black(24%)+odd_even(9%)               234  50.43  +12.59 $  +1944    7% *
+    2 N=14 PERT sector(39%)+set(31%)+red_black(15%)+odd_even(14%)              234  50.00  +12.16 $  +1872    7% *
+    3 N=14 PERT set(34%)+sector(29%)+red_black(23%)+odd_even(12%)              234  50.00  +12.16 $  +1872    7% *
+    4 N=14 PERT set(48%)+sector(37%)+red_black(8%)+odd_even(5%)                234  50.00  +12.16 $  +1872    7% *
+    5 N=14 PERT set(34%)+sector(32%)+odd_even(16%)+red_black(15%)              234  50.00  +12.16 $  +1872    7% *
+    6 N=14 PERT set(50%)+sector(29%)+odd_even(11%)+velocity(8%)                234  49.57  +11.73 $  +1800    7% *
+    7 N=14 PERT set(46%)+sector(26%)+red_black(17%)+odd_even(9%)               234  49.57  +11.73 $  +1800    7% *
+    8 N=14 PERT red_black(31%)+sector(27%)+set(21%)+odd_even(20%)              234  49.57  +11.73 $  +1800    7% *
+    9 N=14 PERT sector(30%)+set(26%)+red_black(18%)+high_low(18%)+odd_even(5%)   234  49.57  +11.73 $  +1800    7% *
+   10 N=14 PERT set(47%)+sector(31%)+red_black(12%)+odd_even(7%)               234  49.57  +11.73 $  +1800    7% *
+   11 N=14 PERT sector(40%)+set(39%)+red_black(11%)+odd_even(8%)               234  49.57  +11.73 $  +1800    7% *
+   12 N=14 PERT set(47%)+sector(37%)+odd_even(8%)+red_black(6%)                234  49.15  +11.31 $  +1728    7% *
+   13 N=14 PERT sector(40%)+set(22%)+red_black(19%)+odd_even(16%)              234  49.15  +11.31 $  +1728    7% *
+   14 N=14 PERT red_black(36%)+sector(27%)+odd_even(19%)+set(16%)              234  49.15  +11.31 $  +1728    7% *
+   15 N=14 PERT red_black(34%)+sector(29%)+set(19%)+odd_even(16%)              234  49.15  +11.31 $  +1728    7% *
+
+========================================================================================================================
+========================================================================================================================
+FINAL REPORT — Marathon V2 Complete
+Time: 2026-02-14 10:15:55
+Total strategies tested: 300 in leaderboard
+========================================================================================================================
+========================================================================================================================
+
+Data: 3781 spins from 8 files
+  data1.txt: 511 spins
+  data2.txt: 507 spins
+  data3.txt: 509 spins
+  data4.txt: 562 spins
+  data5.txt: 439 spins
+  data6.txt: 507 spins
+  data7.txt: 240 spins
+  data8.txt: 506 spins
+
+========================================================================================================================
+TOP 50 STRATEGIES — OVERALL RANKING
+========================================================================================================================
+    # Config                                                                                 Bets   Hit%    Edge   Profit  Bet%
+  ------------------------------------------------------------------------------------------------------------------------
+    1 [NEWDATA] pattern3(55%)+markov(45%)                                                      50  52.00  +14.16 $   +472    1% ★
+    2 [NEWDATA] pattern3(66%)+markov(34%)                                                      50  52.00  +14.16 $   +472    1% ★
+    3 N=14 PERT set(66%)+sector(33%)                                                           94  51.06  +13.23 $   +824    3% ★
+    4 N=14 PERT set(56%)+sector(43%)                                                           94  51.06  +13.23 $   +824    3% ★
+    5 N=14 PERT set(59%)+sector(40%)                                                           94  51.06  +13.23 $   +824    3% ★
+    6 N=14 PERT set(53%)+sector(46%)                                                           94  51.06  +13.23 $   +824    3% ★
+    7 N=14 pattern3(55%)+markov(45%)|tab>=35                                                   49  51.02  +13.18 $   +428    2% ★
+    8 N=14 pattern3(66%)+markov(34%)|tab>=35                                                   49  51.02  +13.18 $   +428    2% ★
+    9 N=14 PERT set(37%)+sector(29%)+red_black(24%)+odd_even(9%)                              234  50.43  +12.59 $  +1944    7% ★
+   10 N=13 PERT set(61%)+sector(38%)                                                           94  50.00  +14.86 $   +940    3% ★
+   11 N=13 PERT set(58%)+sector(41%)                                                           94  50.00  +14.86 $   +940    3% ★
+   12 N=13 PERT set(51%)+polarity(24%)+sector(24%)                                             94  50.00  +14.86 $   +940    3% ★
+   13 N=13 PERT set(54%)+sector(45%)                                                           94  50.00  +14.86 $   +940    3% ★
+   14 N=14 PERT sector(39%)+set(31%)+red_black(15%)+odd_even(14%)                             234  50.00  +12.16 $  +1872    7% ★
+   15 N=14 PERT set(34%)+sector(29%)+red_black(23%)+odd_even(12%)                             234  50.00  +12.16 $  +1872    7% ★
+   16 N=14 PERT set(48%)+sector(37%)+red_black(8%)+odd_even(5%)                               234  50.00  +12.16 $  +1872    7% ★
+   17 N=14 PERT set(34%)+sector(32%)+odd_even(16%)+red_black(15%)                             234  50.00  +12.16 $  +1872    7% ★
+   18 N=13 PERT set(64%)+sector(35%)                                                           94  50.00  +14.86 $   +940    3% ★
+   19 N=14 PERT set(50%)+sector(29%)+odd_even(11%)+velocity(8%)                               234  49.57  +11.73 $  +1800    7% ★
+   20 N=14 PERT set(46%)+sector(26%)+red_black(17%)+odd_even(9%)                              234  49.57  +11.73 $  +1800    7% ★
+   21 N=14 PERT red_black(31%)+sector(27%)+set(21%)+odd_even(20%)                             234  49.57  +11.73 $  +1800    7% ★
+   22 N=14 PERT sector(30%)+set(26%)+red_black(18%)+high_low(18%)+odd_even(5%)                234  49.57  +11.73 $  +1800    7% ★
+   23 N=14 PERT set(47%)+sector(31%)+red_black(12%)+odd_even(7%)                              234  49.57  +11.73 $  +1800    7% ★
+   24 N=14 PERT sector(40%)+set(39%)+red_black(11%)+odd_even(8%)                              234  49.57  +11.73 $  +1800    7% ★
+   25 N=14 PERT set(47%)+sector(37%)+odd_even(8%)+red_black(6%)                               234  49.15  +11.31 $  +1728    7% ★
+   26 N=14 PERT sector(40%)+set(22%)+red_black(19%)+odd_even(16%)                             234  49.15  +11.31 $  +1728    7% ★
+   27 N=14 PERT red_black(36%)+sector(27%)+odd_even(19%)+set(16%)                             234  49.15  +11.31 $  +1728    7% ★
+   28 N=14 PERT red_black(34%)+sector(29%)+set(19%)+odd_even(16%)                             234  49.15  +11.31 $  +1728    7% ★
+   29 N=14 PERT set(46%)+sector(42%)+pattern3(10%)                                            234  49.15  +11.31 $  +1728    7% ★
+   30 N=14 PERT set(37%)+sector(32%)+red_black(24%)+odd_even(5%)                              234  49.15  +11.31 $  +1728    7% ★
+   31 N=14 PERT red_black(35%)+sector(26%)+set(19%)+high_low(18%)                             234  49.15  +11.31 $  +1728    7% ★
+   32 N=14 PERT set(36%)+red_black(27%)+sector(25%)+odd_even(10%)                             234  49.15  +11.31 $  +1728    7% ★
+   33 N=14 pattern3(67%)+markov(33%)|tab>=35                                                   49  48.98  +11.14 $   +356    2% ★
+   34 N=13 set(50%)+sector(45%)+odd_even(5%)|alternating|pol>=25                               94  48.94  +13.80 $   +868    3% ★
+   35 N=14 set(50%)+sector(45%)+odd_even(5%)|alternating|pol>=25                               94  48.94  +11.10 $   +680    3% ★
+   36 N=13 set(55%)+sector(40%)+odd_even(5%)|alternating|pol>=25                               94  48.94  +13.80 $   +868    3% ★
+   37 N=14 set(55%)+sector(40%)+odd_even(5%)|alternating|pol>=25                               94  48.94  +11.10 $   +680    3% ★
+   38 N=13 set(60%)+sector(35%)+odd_even(5%)|alternating|pol>=25                               94  48.94  +13.80 $   +868    3% ★
+   39 N=14 set(60%)+sector(35%)+odd_even(5%)|alternating|pol>=25                               94  48.94  +11.10 $   +680    3% ★
+   40 N=13 PERT set(72%)+sector(27%)                                                           94  48.94  +13.80 $   +868    3% ★
+   41 N=14 PERT set(38%)+sector(33%)+hot(25%)+odd_even(2%)                                     94  48.94  +11.10 $   +680    3% ★
+   42 N=13 PERT set(55%)+polarity(30%)+sector(14%)                                             94  48.94  +13.80 $   +868    3% ★
+   43 N=13 PERT set(57%)+sector(34%)+odd_even(7%)                                              94  48.94  +13.80 $   +868    3% ★
+   44 N=13 PERT set(43%)+sector(28%)+markov2(18%)+odd_even(10%)                                94  48.94  +13.80 $   +868    3% ★
+   45 N=14 PERT set(65%)+sector(22%)+velocity(11%)                                            234  48.72  +10.88 $  +1656    7% ★
+   46 N=14 PERT sector(52%)+set(40%)+hot(7%)                                                  234  48.72  +10.88 $  +1656    7% ★
+   47 N=14 PERT sector(30%)+red_black(29%)+odd_even(28%)+set(11%)                             234  48.72  +10.88 $  +1656    7% ★
+   48 N=14 PERT sector(31%)+set(26%)+high_low(17%)+red_black(15%)+odd_even(10%)               234  48.72  +10.88 $  +1656    7% ★
+   49 N=14 PERT set(44%)+sector(43%)+pattern3(11%)                                            234  48.72  +10.88 $  +1656    7% ★
+   50 N=12 pattern3(55%)+markov(45%)|skip_win_3                                                33  48.48  +16.05 $   +360    1% ★
+
+========================================================================================================================
+TOP 20 RELIABLE STRATEGIES (min 200 bets — needed for confidence)
+========================================================================================================================
+    # Config                                                                                 Bets   Hit%    Edge   Profit
+  -------------------------------------------------------------------------------------------------------------------
+    1 N=14 PERT set(37%)+sector(29%)+red_black(24%)+odd_even(9%)                              234  50.43  +12.59 $  +1944
+    2 N=14 PERT sector(39%)+set(31%)+red_black(15%)+odd_even(14%)                             234  50.00  +12.16 $  +1872
+    3 N=14 PERT set(34%)+sector(29%)+red_black(23%)+odd_even(12%)                             234  50.00  +12.16 $  +1872
+    4 N=14 PERT set(48%)+sector(37%)+red_black(8%)+odd_even(5%)                               234  50.00  +12.16 $  +1872
+    5 N=14 PERT set(34%)+sector(32%)+odd_even(16%)+red_black(15%)                             234  50.00  +12.16 $  +1872
+    6 N=14 PERT set(50%)+sector(29%)+odd_even(11%)+velocity(8%)                               234  49.57  +11.73 $  +1800
+    7 N=14 PERT set(46%)+sector(26%)+red_black(17%)+odd_even(9%)                              234  49.57  +11.73 $  +1800
+    8 N=14 PERT red_black(31%)+sector(27%)+set(21%)+odd_even(20%)                             234  49.57  +11.73 $  +1800
+    9 N=14 PERT sector(30%)+set(26%)+red_black(18%)+high_low(18%)+odd_even(5%)                234  49.57  +11.73 $  +1800
+   10 N=14 PERT set(47%)+sector(31%)+red_black(12%)+odd_even(7%)                              234  49.57  +11.73 $  +1800
+   11 N=14 PERT sector(40%)+set(39%)+red_black(11%)+odd_even(8%)                              234  49.57  +11.73 $  +1800
+   12 N=14 PERT set(47%)+sector(37%)+odd_even(8%)+red_black(6%)                               234  49.15  +11.31 $  +1728
+   13 N=14 PERT sector(40%)+set(22%)+red_black(19%)+odd_even(16%)                             234  49.15  +11.31 $  +1728
+   14 N=14 PERT red_black(36%)+sector(27%)+odd_even(19%)+set(16%)                             234  49.15  +11.31 $  +1728
+   15 N=14 PERT red_black(34%)+sector(29%)+set(19%)+odd_even(16%)                             234  49.15  +11.31 $  +1728
+   16 N=14 PERT set(46%)+sector(42%)+pattern3(10%)                                            234  49.15  +11.31 $  +1728
+   17 N=14 PERT set(37%)+sector(32%)+red_black(24%)+odd_even(5%)                              234  49.15  +11.31 $  +1728
+   18 N=14 PERT red_black(35%)+sector(26%)+set(19%)+high_low(18%)                             234  49.15  +11.31 $  +1728
+   19 N=14 PERT set(36%)+red_black(27%)+sector(25%)+odd_even(10%)                             234  49.15  +11.31 $  +1728
+   20 N=14 PERT set(65%)+sector(22%)+velocity(11%)                                            234  48.72  +10.88 $  +1656
+
+========================================================================================================================
+TOP 20 VERY RELIABLE STRATEGIES (min 500 bets — high confidence)
+========================================================================================================================
+    # Config                                                                                 Bets   Hit%    Edge   Profit
+  -------------------------------------------------------------------------------------------------------------------
+
+========================================================================================================================
+TOP 15 MOST PROFITABLE
+========================================================================================================================
+    1 N=14 PERT set(37%)+sector(29%)+red_black(24%)+odd_even(9%)                            $   +1944 hit=50.43% bets=234
+    2 N=13 PERT set(59%)+sector(26%)+odd_even(14%)                                          $   +1908 hit=47.44% bets=234
+    3 N=13 PERT sector(39%)+red_black(24%)+gap(18%)+odd_even(14%)+set(2%)                   $   +1908 hit=47.44% bets=234
+    4 N=14 PERT sector(39%)+set(31%)+red_black(15%)+odd_even(14%)                           $   +1872 hit=50.0% bets=234
+    5 N=14 PERT set(34%)+sector(29%)+red_black(23%)+odd_even(12%)                           $   +1872 hit=50.0% bets=234
+    6 N=14 PERT set(48%)+sector(37%)+red_black(8%)+odd_even(5%)                             $   +1872 hit=50.0% bets=234
+    7 N=14 PERT set(34%)+sector(32%)+odd_even(16%)+red_black(15%)                           $   +1872 hit=50.0% bets=234
+    8 N=14 PERT set(50%)+sector(29%)+odd_even(11%)+velocity(8%)                             $   +1800 hit=49.57% bets=234
+    9 N=14 PERT set(46%)+sector(26%)+red_black(17%)+odd_even(9%)                            $   +1800 hit=49.57% bets=234
+   10 N=14 PERT red_black(31%)+sector(27%)+set(21%)+odd_even(20%)                           $   +1800 hit=49.57% bets=234
+   11 N=14 PERT sector(30%)+set(26%)+red_black(18%)+high_low(18%)+odd_even(5%)              $   +1800 hit=49.57% bets=234
+   12 N=14 PERT set(47%)+sector(31%)+red_black(12%)+odd_even(7%)                            $   +1800 hit=49.57% bets=234
+   13 N=14 PERT sector(40%)+set(39%)+red_black(11%)+odd_even(8%)                            $   +1800 hit=49.57% bets=234
+   14 N=13 PERT set(63%)+sector(29%)+odd_even(6%)                                           $   +1764 hit=46.58% bets=234
+   15 N=13 PERT set(59%)+sector(27%)+odd_even(12%)                                          $   +1764 hit=46.58% bets=234
+
+========================================================================================================================
+★ STRATEGIES HITTING 35%+ TARGET (min 100 bets) ★
+========================================================================================================================
+    1 N=14 PERT set(37%)+sector(29%)+red_black(24%)+odd_even(9%)                             50.43% $  +1944 bets=234
+    2 N=14 PERT sector(39%)+set(31%)+red_black(15%)+odd_even(14%)                            50.00% $  +1872 bets=234
+    3 N=14 PERT set(34%)+sector(29%)+red_black(23%)+odd_even(12%)                            50.00% $  +1872 bets=234
+    4 N=14 PERT set(48%)+sector(37%)+red_black(8%)+odd_even(5%)                              50.00% $  +1872 bets=234
+    5 N=14 PERT set(34%)+sector(32%)+odd_even(16%)+red_black(15%)                            50.00% $  +1872 bets=234
+    6 N=14 PERT set(50%)+sector(29%)+odd_even(11%)+velocity(8%)                              49.57% $  +1800 bets=234
+    7 N=14 PERT set(46%)+sector(26%)+red_black(17%)+odd_even(9%)                             49.57% $  +1800 bets=234
+    8 N=14 PERT red_black(31%)+sector(27%)+set(21%)+odd_even(20%)                            49.57% $  +1800 bets=234
+    9 N=14 PERT sector(30%)+set(26%)+red_black(18%)+high_low(18%)+odd_even(5%)               49.57% $  +1800 bets=234
+   10 N=14 PERT set(47%)+sector(31%)+red_black(12%)+odd_even(7%)                             49.57% $  +1800 bets=234
+
+========================================================================================================================
+CROSS-VALIDATION — Top 10 strategies on each individual file
+========================================================================================================================
+
+  Strategy                                                             data1    data2    data3    data4    data5    data6    data7    data8  COMBINED Files+
+  ---------------------------------------------------------------------------------------------------------------------------------------------------------
+  set(37%)+sector(29%)+red_black(24%)+odd_even(9%)                   36.4%-  41.8%+  38.3%+  40.6%+  40.1%+  39.6%+  37.0%-  35.2%-  46.9%+   5/8
+  sector(39%)+set(31%)+red_black(15%)+odd_even(14%)                  38.1%+  41.4%+  38.8%+  39.8%+  39.3%+  40.5%+  35.4%-  35.0%-  46.5%+   6/8
+  set(34%)+sector(29%)+red_black(23%)+odd_even(12%)                  36.8%-  42.3%+  38.5%+  40.0%+  39.3%+  39.8%+  36.5%-  35.4%-  46.5%+   5/8
+  set(48%)+sector(37%)+red_black(8%)+odd_even(5%)                    37.2%-  40.9%+  38.8%+  40.4%+  38.3%+  40.9%+  37.0%-  35.2%-  46.1%+   5/8
+  set(34%)+sector(32%)+odd_even(16%)+red_black(15%)                  38.1%+  41.4%+  39.0%+  40.2%+  39.0%+  40.5%+  36.5%-  35.2%-  46.5%+   6/8
+  set(50%)+sector(29%)+odd_even(11%)+velocity(8%)                    33.5%-  40.5%+  39.4%+  41.0%+  38.3%+  40.3%+  42.7%+  33.6%-  45.8%+   6/8
+  set(46%)+sector(26%)+red_black(17%)+odd_even(9%)                   36.8%-  42.5%+  39.2%+  40.2%+  39.0%+  40.5%+  38.0%+  35.6%-  46.5%+   6/8
+  red_black(31%)+sector(27%)+set(21%)+odd_even(20%)                  36.4%-  39.6%+  38.5%+  40.0%+  40.4%+  38.9%+  37.0%-  34.5%-  45.8%+   5/8
+  sector(30%)+set(26%)+red_black(18%)+high_low(18%)+odd_even(5%)     36.6%-  42.1%+  39.4%+  41.0%+  38.8%+  39.1%+  37.5%-  37.7%-  46.5%+   5/8
+  set(47%)+sector(31%)+red_black(12%)+odd_even(7%)                   37.5%-  41.8%+  39.0%+  40.2%+  38.5%+  41.2%+  38.0%+  35.2%-  46.1%+   6/8
+
+========================================================================================================================
+★ ★ ★  FINAL VERDICT — BEST MODELS  ★ ★ ★
+========================================================================================================================
+
+  HIGHEST HIT RATE:
+     [NEWDATA] pattern3(55%)+markov(45%)
+     Hit: 52.0% | Edge: +14.16% | Profit: $+472
+     Bets: 50 (1.4% of spins)
+
+  BEST RELIABLE (200+ bets):
+     N=14 PERT set(37%)+sector(29%)+red_black(24%)+odd_even(9%)
+     Hit: 50.43% | Edge: +12.59% | Profit: $+1944
+     Bets: 234 (7.3% of spins)
+
+  MOST PROFITABLE:
+     N=14 PERT set(37%)+sector(29%)+red_black(24%)+odd_even(9%)
+     Profit: $+1944 | Hit: 50.43% | Bets: 234
+
+  HIGHEST HIT RATE (100+ bets, 35%+ target):
+     N=14 PERT set(37%)+sector(29%)+red_black(24%)+odd_even(9%)
+     Hit: 50.43% | Profit: $+1944 | Bets: 234
+
+  Baseline: 32.43% (12/37)
+  Break-even N=12: 33.33%
+  Break-even N=13: 36.11%
+  TARGET: 35-36% sustained for +$100/session
+
+========================================================================================================================
+RECOMMENDATION FOR LIVE PLAY
+========================================================================================================================
+
+  BEST SELECTIVE (35%+ hit rate, 100+ bets):
+     N=14 PERT set(37%)+sector(29%)+red_black(24%)+odd_even(9%)
+     Hit: 50.43% | Edge: +12.59% | Profit: $+1944
+     Bets: 234 (7.3% of spins)
+
+========================================================================================================================
+Marathon V2 finished. Total tested: 300 strategies in leaderboard.
+========================================================================================================================
+

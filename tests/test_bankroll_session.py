@@ -12,9 +12,8 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 from config import (INITIAL_BANKROLL, BASE_BET, SESSION_TARGET,
                     STOP_LOSS_THRESHOLD, MAX_CONSECUTIVE_LOSSES,
                     FORCED_WAIT_SPINS, CONFIDENCE_BET_THRESHOLD,
-                    CONFIDENCE_HIGH_THRESHOLD, MIN_BET, BET_INCREMENT,
-                    BET_DECREMENT, LOSSES_BEFORE_INCREMENT,
-                    WINS_BEFORE_DECREMENT, TOP_PREDICTIONS_COUNT)
+                    CONFIDENCE_HIGH_THRESHOLD, MIN_BET, BET_SEQUENCE,
+                    SESSION_TARGET_ENABLED, TOP_PREDICTIONS_COUNT)
 from app.money.bankroll_manager import BankrollManager
 
 
@@ -46,14 +45,15 @@ class TestBankrollManager:
         assert bm.win_rate == 0.0
 
     def test_process_win(self):
-        """Straight bet on 12 numbers: $1 each = $12 total.
-        One number hits: payout $35 + $1 stake back - $12 total = +$24 net profit."""
+        """Straight bet on N numbers: $1 each = $N total.
+        One number hits: payout $35 + $1 stake back - $N total = net profit."""
         bm = BankrollManager()
         initial = bm.bankroll
-        # Simulate: $1/number × 12 numbers = $12 total, payout 35:1 = $35
-        bm.process_result(bet_amount=12, won=True, payout_amount=35)
-        # Net = $35 + $1 (stake) - $12 (total) = $24
-        assert bm.bankroll == initial + 24
+        n = TOP_PREDICTIONS_COUNT  # 14 numbers
+        # Simulate: $1/number × N numbers = $N total, payout 35:1 = $35
+        bm.process_result(bet_amount=n, won=True, payout_amount=35)
+        # Net = $35 + $1 (stake) - $N (total) = 36 - N
+        assert bm.bankroll == initial + (36 - n)
         assert bm.total_wins == 1
         assert bm.consecutive_losses == 0
         assert bm.consecutive_wins == 1
@@ -73,18 +73,15 @@ class TestBankrollManager:
             bm.process_result(bet_amount=2, won=False)
         assert bm.in_recovery_mode == True
 
-    def test_loss_streak_requires_high_confidence(self):
-        """After MAX_CONSECUTIVE_LOSSES, AI requires higher confidence to bet."""
+    def test_loss_streak_bets_with_high_confidence(self):
+        """After losses, still bets if confidence is high enough."""
         bm = BankrollManager()
-        for _ in range(MAX_CONSECUTIVE_LOSSES):
+        for _ in range(5):
             bm.process_result(bet_amount=2, won=False)
-        # Low confidence (35%) should be blocked after loss streak
-        can_bet, reason = bm.should_bet(35, 'BET')
-        assert can_bet == False
-        assert 'LOSS_STREAK' in reason
-        # High confidence (CONFIDENCE_HIGH_THRESHOLD+) should still allow betting
-        can_bet_high, reason_high = bm.should_bet(CONFIDENCE_HIGH_THRESHOLD + 5, 'BET')
-        assert can_bet_high == True
+        # With conf >= 65, should still bet (no cooldown, no forced wait)
+        can_bet, reason = bm.should_bet(70, 'BET_HIGH')
+        assert can_bet == True
+        assert reason == 'BET'
 
     def test_tick_wait_decrements(self):
         bm = BankrollManager()
@@ -104,22 +101,23 @@ class TestBankrollManager:
 
     def test_should_bet_sufficient_confidence(self):
         bm = BankrollManager()
-        can_bet, reason = bm.should_bet(60, 'BET')
+        can_bet, reason = bm.should_bet(70, 'BET_HIGH')
         assert can_bet == True
         assert reason == 'BET'
 
-    def test_session_target_reached(self):
+    def test_session_target_disabled(self):
+        """With SESSION_TARGET_ENABLED=False, target is never reached (no profit cap)."""
         bm = BankrollManager()
-        # Simulate enough wins to reach target
         bm.bankroll = INITIAL_BANKROLL + SESSION_TARGET + 1
-        assert bm.session_target_reached == True
-        can_bet, reason = bm.should_bet(80, 'BET_HIGH')
-        assert can_bet == False
-        assert reason == 'SESSION_TARGET_REACHED'
+        assert bm.session_target_reached == False  # Always False when disabled
+        can_bet, reason = bm.should_bet(70, 'BET_HIGH')
+        assert can_bet == True
+        assert reason == 'BET'
 
     def test_stop_loss_hit(self):
+        """Stop-loss at $3500 = $500 loss from $4000 bankroll."""
         bm = BankrollManager()
-        bm.bankroll = STOP_LOSS_THRESHOLD - 1
+        bm.bankroll = STOP_LOSS_THRESHOLD - 1  # Below $3500
         assert bm.stop_loss_hit == True
         can_bet, reason = bm.should_bet(80, 'BET_HIGH')
         assert can_bet == False
@@ -133,74 +131,87 @@ class TestBankrollManager:
         if bm.bankroll < STOP_LOSS_THRESHOLD:
             assert bm.in_protection_mode == True
 
-    def test_base_bet_is_1_dollar(self):
+    def test_sequence_starts_at_step_0(self):
+        """Initial sequence position is 0, bet = BASE_BET × 1."""
         bm = BankrollManager()
-        assert bm.current_bet_level == MIN_BET
-        assert MIN_BET == 1.0
+        assert bm.seq_idx == 0
+        assert bm.bet_sequence == list(BET_SEQUENCE)
+        assert bm.unit_size == BASE_BET
 
-    def test_calculate_bet_amount_returns_current_level(self):
+    def test_calculate_bet_amount_step_0(self):
+        """Step 0: bet = $7.50 × 1 = $7.50 per number."""
         bm = BankrollManager()
-        bet = bm.calculate_bet_amount(60, 'straight')
-        assert bet == MIN_BET
+        bet = bm.calculate_bet_amount(70, 'straight')
+        assert bet == BASE_BET * BET_SEQUENCE[0]  # $7.50 × 1
 
-    def test_bet_increment_after_3_losses(self):
-        """After LOSSES_BEFORE_INCREMENT successive losses, bet should increase by BET_INCREMENT"""
+    def test_sequence_advance_on_win(self):
+        """After a win, sequence advances to next step."""
         bm = BankrollManager()
-        assert bm.current_bet_level == MIN_BET
-        # Simulate 3 successive losses (loss_streak_for_increment counts across forced waits)
-        for _ in range(LOSSES_BEFORE_INCREMENT):
-            bm.process_result(bet_amount=12, won=False)
-        assert bm.current_bet_level == MIN_BET + BET_INCREMENT
+        assert bm.seq_idx == 0
+        bm.process_result(bet_amount=TOP_PREDICTIONS_COUNT * BASE_BET, won=True, payout_amount=35 * BASE_BET)
+        assert bm.seq_idx == 1  # Advanced to step 1 (x6)
 
-    def test_bet_decrement_after_2_wins(self):
-        """After WINS_BEFORE_DECREMENT consecutive wins, bet should decrease by BET_DECREMENT"""
+    def test_sequence_reset_on_loss(self):
+        """After a loss, sequence resets to step 0."""
         bm = BankrollManager()
-        # First increase the bet level
-        bm.current_bet_level = 3.0
-        # Simulate 2 consecutive wins
-        for _ in range(WINS_BEFORE_DECREMENT):
-            bm.process_result(bet_amount=12, won=True, payout_amount=35)
-        assert bm.current_bet_level == 3.0 - BET_DECREMENT
+        # First win to advance
+        bm.process_result(bet_amount=TOP_PREDICTIONS_COUNT * BASE_BET, won=True, payout_amount=35 * BASE_BET)
+        assert bm.seq_idx == 1
+        # Then loss to reset
+        bm.process_result(bet_amount=TOP_PREDICTIONS_COUNT * 45, won=False)
+        assert bm.seq_idx == 0
 
-    def test_bet_floor_at_1_dollar(self):
-        """Bet should never go below MIN_BET"""
+    def test_bet_amount_at_each_step(self):
+        """Verify dollar amounts: $7.50, $45, $97.50, $112.50, $67.50."""
         bm = BankrollManager()
-        assert bm.current_bet_level == MIN_BET
-        # Simulate 2 consecutive wins at minimum level — should stay at MIN_BET
-        for _ in range(WINS_BEFORE_DECREMENT):
-            bm.process_result(bet_amount=12, won=True, payout_amount=35)
-        assert bm.current_bet_level == MIN_BET
+        expected = [7.50, 45.0, 97.50, 112.50, 67.50]
+        for i, exp in enumerate(expected):
+            bm.seq_idx = i
+            bet = bm.calculate_bet_amount(70, 'straight', 14)
+            assert bet == exp, f"Step {i}: expected ${exp}, got ${bet}"
 
-    def test_increment_decrement_cycle(self):
-        """Full cycle: 3 successive losses → +$1 → 3 more → +$1 → 2 wins → -$1"""
+    def test_sequence_wraps_after_full_cycle(self):
+        """After 5 consecutive wins, sequence wraps back to step 0."""
         bm = BankrollManager()
-        assert bm.current_bet_level == 1.0
-        # 3 successive losses → bet goes to 2.0
-        # (Note: forced wait triggers at loss 2, but loss_streak_for_increment
-        #  keeps counting across forced waits)
-        for _ in range(LOSSES_BEFORE_INCREMENT):
-            bm.process_result(bet_amount=12, won=False)
-        assert bm.current_bet_level == 2.0
-        # 3 more successive losses → bet goes to 3.0
-        for _ in range(LOSSES_BEFORE_INCREMENT):
-            bm.process_result(bet_amount=24, won=False)
-        assert bm.current_bet_level == 3.0
-        # 2 consecutive wins → bet goes back to 2.0
-        for _ in range(WINS_BEFORE_DECREMENT):
-            bm.process_result(bet_amount=36, won=True, payout_amount=35)
-        assert bm.current_bet_level == 2.0
+        for i in range(5):
+            bm.process_result(bet_amount=10, won=True, payout_amount=35)
+        assert bm.seq_idx == 0  # Wrapped back
 
-    def test_total_bet_is_per_number_times_12(self):
+    def test_sequence_full_cycle(self):
+        """Win-win-loss pattern: advance-advance-reset."""
         bm = BankrollManager()
-        per_number = bm.calculate_bet_amount()
+        bm.process_result(10, True, 35)   # idx 0→1
+        bm.process_result(10, True, 35)   # idx 1→2
+        assert bm.seq_idx == 2
+        bm.process_result(10, False)       # idx→0
+        assert bm.seq_idx == 0
+        bm.process_result(10, True, 35)   # idx 0→1
+        assert bm.seq_idx == 1
+
+    def test_total_bet_is_per_number_times_count(self):
+        bm = BankrollManager()
+        per_number = bm.calculate_bet_amount(70, 'straight', TOP_PREDICTIONS_COUNT)
         total = per_number * TOP_PREDICTIONS_COUNT
-        assert total == MIN_BET * 12
+        assert total == BASE_BET * BET_SEQUENCE[0] * TOP_PREDICTIONS_COUNT
 
-    def test_bet_amount_capped_at_5_percent(self):
+    def test_bet_floor_at_min_bet(self):
+        """Bet should never go below MIN_BET."""
         bm = BankrollManager()
-        bet = bm.calculate_bet_amount(99, 'straight')
-        total = bet * TOP_PREDICTIONS_COUNT
-        assert total <= bm.bankroll * 0.05 + 0.01  # small rounding tolerance
+        bet = bm.calculate_bet_amount(70, 'straight', 14)
+        assert bet >= MIN_BET
+
+    def test_undo_rebuilds_sequence_position(self):
+        """Undo should correctly rebuild seq_idx from history."""
+        bm = BankrollManager()
+        bm.process_result(10, True, 35)   # idx→1
+        bm.process_result(10, True, 35)   # idx→2
+        bm.process_result(10, False)       # idx→0
+        bm.process_result(10, True, 35)   # idx→1
+        assert bm.seq_idx == 1
+        bm.undo_last_bet()                 # Remove last win, should be at idx=0
+        assert bm.seq_idx == 0
+        bm.undo_last_bet()                 # Remove the loss, should be at idx=2
+        assert bm.seq_idx == 2
 
     def test_drawdown_calculation(self):
         bm = BankrollManager()
@@ -221,7 +232,7 @@ class TestBankrollManager:
 
     def test_risk_level_critical(self):
         bm = BankrollManager()
-        bm.bankroll = STOP_LOSS_THRESHOLD - 100
+        bm.bankroll = STOP_LOSS_THRESHOLD - 100  # Below $3500
         assert bm.risk_level == 'critical'
 
     def test_momentum_tracking(self):
@@ -246,13 +257,14 @@ class TestBankrollManager:
                          'total_wins', 'total_losses', 'total_bets',
                          'consecutive_losses', 'forced_wait_remaining',
                          'in_recovery_mode', 'in_protection_mode',
-                         'risk_level', 'drawdown', 'momentum']
+                         'risk_level', 'drawdown', 'momentum',
+                         'seq_position', 'seq_step_label', 'seq_multiplier']
         for key in expected_keys:
             assert key in status, f"Missing key: {key}"
 
     def test_get_advice_structure(self):
         bm = BankrollManager()
-        advice = bm.get_advice(ai_confidence=60, ai_mode='BET')
+        advice = bm.get_advice(ai_confidence=70, ai_mode='BET_HIGH')
         assert 'action' in advice
         assert 'reason' in advice
         assert 'strategy' in advice
@@ -304,11 +316,11 @@ class TestBankrollManager:
 
     def test_insufficient_bankroll(self):
         bm = BankrollManager()
-        bm.bankroll = 0.5  # Less than base bet AND below stop loss
+        bm.bankroll = 0.5  # Less than base bet AND below stop loss ($3500)
         can_bet, reason = bm.should_bet(80, 'BET_HIGH')
         assert can_bet == False
-        # Stop loss check fires first since bankroll < STOP_LOSS_THRESHOLD
-        assert reason in ('STOP_LOSS_HIT', 'INSUFFICIENT_BANKROLL')
+        # Stop loss check fires first since bankroll < STOP_LOSS_THRESHOLD ($3500)
+        assert reason == 'STOP_LOSS_HIT'
 
 
 if __name__ == '__main__':
